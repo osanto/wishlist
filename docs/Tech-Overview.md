@@ -35,19 +35,19 @@ Tables:
 - `Wishlist` - stores `admin_token` and `guest_token` fields
 - `Items`
 
- **`wishlist`**
+  **`wishlist`**
 
 Supports both single and multiple wishlists with no changes later.
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `id` | UUID | PK |
-| `admin_token` | text | Secret admin token for edit access |
-| `guest_token` | text | Secret guest token for view access |
-| `title` | text | Wishlist title |
-| `description` | text | Optional |
-| `created_at` | timestamp | Auto |
-| `updated_at` | timestamp | Auto |
+| Field         | Type      | Description                        |
+| ------------- | --------- | ---------------------------------- |
+| `id`          | UUID      | PK                                 |
+| `admin_token` | text      | Secret admin token for edit access |
+| `guest_token` | text      | Secret guest token for view access |
+| `title`       | text      | Wishlist title                     |
+| `description` | text      | Optional                           |
+| `created_at`  | timestamp | Auto                               |
+| `updated_at`  | timestamp | Auto                               |
 
 **This table already supports unlimited wishlists — nothing extra needed.**
 
@@ -55,18 +55,18 @@ Supports both single and multiple wishlists with no changes later.
 
 **`items`**
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `id` | UUID | PK |
-| `wishlist_id` | UUID | FK → wishlist.id |
-| `name` | text | Item name |
-| `link` | text | Optional |
-| `image_url` | text | Optional |
-| `price` | text | Optional, display-only (e.g., "$50")  |
-| `notes` | text | Optional |
+| Field               | Type            | Description                                |
+| ------------------- | --------------- | ------------------------------------------ |
+| `id`                | UUID            | PK                                         |
+| `wishlist_id`       | UUID            | FK → wishlist.id                           |
+| `name`              | text            | Item name                                  |
+| `link`              | text            | Optional                                   |
+| `image_url`         | text            | Optional                                   |
+| `price`             | text            | Optional, display-only (e.g., "$50")       |
+| `notes`             | text            | Optional                                   |
 | `reserved_by_token` | text (nullable) | Guest reservation token (NULL = available) |
-| `is_reserved` | boolean | Convenience boolean |
-| `created_at` | timestamp | Auto |
+| `is_reserved`       | boolean         | Convenience boolean                        |
+| `created_at`        | timestamp       | Auto                                       |
 
 # 5. **Security / Access Control**
 

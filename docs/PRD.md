@@ -58,8 +58,8 @@ Can:
 - Reserve **multiple** items
 - Cancel their own reservations
 - Can see:
-    - “Reserved” - Reserved items (not who reserved them)
-    - “You reserved this” on items they reserved
+  - “Reserved” - Reserved items (not who reserved them)
+  - “You reserved this” on items they reserved
 
 Guest identity is stored locally using a **local reservation token** (localStorage).
 
@@ -71,45 +71,45 @@ Guest identity is stored locally using a **local reservation token** (localStora
 2. Sees "Create Your Wishlist" button
 3. Clicks button
 4. System generates:
-    - New wishlist with default title "My Wishlist"
-    - Unique admin token
-    - Unique guest token
+   - New wishlist with default title "My Wishlist"
+   - Unique admin token
+   - Unique guest token
 5. User redirected to admin page `/admin/[adminToken]`
 6. Admin sees:
-    - Wishlist title (editable)
-    - "Share with guests" section with guest link
-    - Copy link button
-    - "Add Item" button
-    - Empty state: "Add your first item."
+   - Wishlist title (editable)
+   - "Share with guests" section with guest link
+   - Copy link button
+   - "Add Item" button
+   - Empty state: "Add your first item."
 
 ## **3.1 Admin Flow**
 
 1. Visit admin link
 2. See wishlist title + description + items
 3. Admin can:
-    - Add new wishlist items
-    - Edit name, link, price, notes
-    - Delete item
+   - Add new wishlist items
+   - Edit name, link, price, notes
+   - Delete item
 4. Admin sees reservation state:
-    - Reserved / Not reserved
+   - Reserved / Not reserved
 5. Admin cannot see the reserver’s name or identity.
 
 ## **3.2 Guest Flow**
 
 1. Guest opens guest link with `guestToken`.
 2. Sees wishlist items with:
-    - Name
-    - Link
-    - Price
-    - Notes
-    - Reservation status
+   - Name
+   - Link
+   - Price
+   - Notes
+   - Reservation status
 3. Guest can:
-    - Guest can reserve **multiple** items.
-    - If they reserved an item:
-        - They see: **“You reserved this item”**
-        - It is **unavailable** to other guests
-    - If someone else reserved it:
-        - They see: **“Reserved”**
+   - Guest can reserve **multiple** items.
+   - If they reserved an item:
+     - They see: **“You reserved this item”**
+     - It is **unavailable** to other guests
+   - If someone else reserved it:
+     - They see: **“Reserved”**
 4. Guest can **cancel** only their reservations.
 5. Guest identity remains anonymous throughout their session.
 
