@@ -1,9 +1,6 @@
-import { type Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Manage Wishlist | Wishlist",
-  description: "Manage your wishlist items",
-};
+import { ItemCard } from "@/components/item-card";
 
 // Mock data for Phase 1
 const mockWishlist = {
@@ -104,56 +101,17 @@ export default async function AdminPage({ params }: AdminPageProps) {
           ) : (
             <div className="space-y-4">
               {mockItems.map((item) => (
-                <div
+                <ItemCard
                   key={item.id}
-                  data-test-id={`item-card-${item.id}`}
-                  className="rounded-lg border bg-card p-6"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-semibold">{item.name}</h3>
-                        {item.isReserved && (
-                          <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium">
-                            Reserved
-                          </span>
-                        )}
-                      </div>
-                      {item.price && (
-                        <p className="text-sm font-medium">{item.price}</p>
-                      )}
-                      {item.link && (
-                        <a
-                          href={item.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-primary hover:underline"
-                        >
-                          View Item
-                        </a>
-                      )}
-                      {item.notes && (
-                        <p className="text-sm text-muted-foreground">
-                          {item.notes}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        data-test-id={`edit-item-${item.id}`}
-                        className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm hover:bg-accent hover:text-accent-foreground"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        data-test-id={`delete-item-${item.id}`}
-                        className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm hover:bg-destructive hover:text-destructive-foreground"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                  item={item}
+                  variant="admin"
+                  onEdit={() => {
+                    // TODO: Open edit dialog
+                  }}
+                  onDelete={() => {
+                    // TODO: Open delete dialog
+                  }}
+                />
               ))}
             </div>
           )}
