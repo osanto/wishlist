@@ -1,9 +1,6 @@
-import { type Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Wishlist | View & Reserve",
-  description: "View wishlist and reserve items",
-};
+import { ItemCard } from "@/components/item-card";
 
 // Mock data for Phase 1
 const mockWishlist = {
@@ -86,73 +83,29 @@ export default async function GuestPage({ params }: GuestPageProps) {
                   item.isReserved &&
                   item.reservedByToken !== currentUserReservationToken;
 
+                let reservationStatus:
+                  | "available"
+                  | "reserved-by-me"
+                  | "reserved-by-other" = "available";
+                if (isReservedByMe) {
+                  reservationStatus = "reserved-by-me";
+                } else if (isReservedByOther) {
+                  reservationStatus = "reserved-by-other";
+                }
+
                 return (
-                  <div
+                  <ItemCard
                     key={item.id}
-                    data-test-id={`item-card-${item.id}`}
-                    className="rounded-lg border bg-card p-6"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-semibold">{item.name}</h3>
-                          {isReservedByMe && (
-                            <span
-                              data-test-id={`you-reserved-badge-${item.id}`}
-                              className="inline-flex items-center rounded-full bg-primary px-2.5 py-0.5 text-xs font-medium text-primary-foreground"
-                            >
-                              You reserved this
-                            </span>
-                          )}
-                          {isReservedByOther && (
-                            <span
-                              data-test-id={`reserved-badge-${item.id}`}
-                              className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium"
-                            >
-                              Reserved
-                            </span>
-                          )}
-                        </div>
-                        {item.price && (
-                          <p className="text-sm font-medium">{item.price}</p>
-                        )}
-                        {item.link && (
-                          <a
-                            href={item.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-primary hover:underline"
-                          >
-                            View Item
-                          </a>
-                        )}
-                        {item.notes && (
-                          <p className="text-sm text-muted-foreground">
-                            {item.notes}
-                          </p>
-                        )}
-                      </div>
-                      {!isReservedByOther && (
-                        <div>
-                          {isReservedByMe ? (
-                            <button
-                              data-test-id={`cancel-reservation-${item.id}`}
-                              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-4 text-sm hover:bg-accent hover:text-accent-foreground"
-                            >
-                              Cancel Reservation
-                            </button>
-                          ) : (
-                            <button
-                              data-test-id={`reserve-button-${item.id}`}
-                              className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-                            >
-                              Reserve
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                    item={item}
+                    variant="guest"
+                    reservationStatus={reservationStatus}
+                    onReserve={() => {
+                      // TODO: Handle reservation
+                    }}
+                    onCancelReservation={() => {
+                      // TODO: Handle cancel reservation
+                    }}
+                  />
                 );
               })}
             </div>
