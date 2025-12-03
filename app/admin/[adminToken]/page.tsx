@@ -1,8 +1,4 @@
-"use client";
-
-import { use } from "react";
-
-import { ItemCard } from "@/components/item-card";
+import { AdminItemsList } from "@/components/admin-items-list";
 
 // Mock data for Phase 1
 const mockWishlist = {
@@ -39,8 +35,8 @@ interface AdminPageProps {
   }>;
 }
 
-export default function AdminPage({ params }: AdminPageProps) {
-  const { adminToken: _adminToken } = use(params);
+export default async function AdminPage({ params }: AdminPageProps) {
+  const { adminToken: _adminToken } = await params;
 
   const guestUrl =
     typeof window !== "undefined"
@@ -101,21 +97,7 @@ export default function AdminPage({ params }: AdminPageProps) {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {mockItems.map((item) => (
-                <ItemCard
-                  key={item.id}
-                  item={item}
-                  variant="admin"
-                  onEdit={() => {
-                    // TODO: Open edit dialog
-                  }}
-                  onDelete={() => {
-                    // TODO: Open delete dialog
-                  }}
-                />
-              ))}
-            </div>
+            <AdminItemsList items={mockItems} />
           )}
         </div>
       </div>

@@ -1,8 +1,4 @@
-"use client";
-
-import { use } from "react";
-
-import { ItemCard } from "@/components/item-card";
+import { GuestItemsList } from "@/components/guest-items-list";
 
 // Mock data for Phase 1
 const mockWishlist = {
@@ -50,8 +46,8 @@ interface GuestPageProps {
   }>;
 }
 
-export default function GuestPage({ params }: GuestPageProps) {
-  const { guestToken: _guestToken } = use(params);
+export default async function GuestPage({ params }: GuestPageProps) {
+  const { guestToken: _guestToken } = await params;
 
   return (
     <div className="min-h-screen bg-background">
@@ -76,41 +72,10 @@ export default function GuestPage({ params }: GuestPageProps) {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {mockItems.map((item) => {
-                const isReservedByMe =
-                  item.isReserved &&
-                  item.reservedByToken === currentUserReservationToken;
-                const isReservedByOther =
-                  item.isReserved &&
-                  item.reservedByToken !== currentUserReservationToken;
-
-                let reservationStatus:
-                  | "available"
-                  | "reserved-by-me"
-                  | "reserved-by-other" = "available";
-                if (isReservedByMe) {
-                  reservationStatus = "reserved-by-me";
-                } else if (isReservedByOther) {
-                  reservationStatus = "reserved-by-other";
-                }
-
-                return (
-                  <ItemCard
-                    key={item.id}
-                    item={item}
-                    variant="guest"
-                    reservationStatus={reservationStatus}
-                    onReserve={() => {
-                      // TODO: Handle reservation
-                    }}
-                    onCancelReservation={() => {
-                      // TODO: Handle cancel reservation
-                    }}
-                  />
-                );
-              })}
-            </div>
+            <GuestItemsList
+              items={mockItems}
+              currentUserReservationToken={currentUserReservationToken}
+            />
           )}
         </div>
       </div>
