@@ -1,7 +1,3 @@
-"use client";
-
-import { use } from "react";
-
 import { ItemCard } from "@/components/item-card";
 
 // Mock data for Phase 1
@@ -50,8 +46,8 @@ interface GuestPageProps {
   }>;
 }
 
-export default function GuestPage({ params }: GuestPageProps) {
-  const { guestToken: _guestToken } = use(params);
+export default async function GuestPage({ params }: GuestPageProps) {
+  const { guestToken: _guestToken } = await params;
 
   return (
     <div className="min-h-screen bg-background">
