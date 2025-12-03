@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -22,7 +21,6 @@ import { Textarea } from "@/components/ui/textarea";
 const editItemSchema = z.object({
   name: z.string().min(1, "Name is required"),
   link: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  price: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -62,7 +60,6 @@ export function EditItemDialog({
     defaultValues: {
       name: "",
       link: "",
-      price: "",
       notes: "",
     },
   });
@@ -72,7 +69,6 @@ export function EditItemDialog({
     if (item) {
       setValue("name", item.name);
       setValue("link", item.link || "");
-      setValue("price", item.price || "");
       setValue("notes", item.notes || "");
     } else {
       reset();
@@ -97,12 +93,9 @@ export function EditItemDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit Item</DialogTitle>
-          <DialogDescription>
-            Update the item details. Click save when you&apos;re done.
-          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-2">
             <div className="grid gap-2">
               <Label htmlFor="edit-name">
                 Name <span className="text-destructive">*</span>
@@ -132,21 +125,6 @@ export function EditItemDialog({
               {errors.link && (
                 <p className="text-sm text-destructive">
                   {errors.link.message}
-                </p>
-              )}
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="edit-price">Price</Label>
-              <Input
-                id="edit-price"
-                data-test-id="edit-item-price-input"
-                {...register("price")}
-                placeholder="$99.99"
-              />
-              {errors.price && (
-                <p className="text-sm text-destructive">
-                  {errors.price.message}
                 </p>
               )}
             </div>

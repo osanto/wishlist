@@ -31,7 +31,6 @@ export function AdminItemsList({ items }: AdminItemsListProps) {
   const handleEditSubmit = (itemId: string, data: {
     name: string;
     link?: string;
-    price?: string;
     notes?: string;
   }) => {
     // TODO: Update item in mock store (Phase 1.3)

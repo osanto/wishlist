@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -22,7 +21,6 @@ import { Textarea } from "@/components/ui/textarea";
 const addItemSchema = z.object({
   name: z.string().min(1, "Name is required"),
   link: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  price: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -51,7 +49,6 @@ export function AddItemDialog({
     defaultValues: {
       name: "",
       link: "",
-      price: "",
       notes: "",
     },
   });
@@ -72,12 +69,9 @@ export function AddItemDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add Item</DialogTitle>
-          <DialogDescription>
-            Add a new item to your wishlist. Fill in the details below.
-          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-2">
             <div className="grid gap-2">
               <Label htmlFor="name">
                 Name <span className="text-destructive">*</span>
@@ -107,21 +101,6 @@ export function AddItemDialog({
               {errors.link && (
                 <p className="text-sm text-destructive">
                   {errors.link.message}
-                </p>
-              )}
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="price">Price</Label>
-              <Input
-                id="price"
-                data-test-id="item-price-input"
-                {...register("price")}
-                placeholder="$99.99"
-              />
-              {errors.price && (
-                <p className="text-sm text-destructive">
-                  {errors.price.message}
                 </p>
               )}
             </div>

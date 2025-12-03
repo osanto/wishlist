@@ -29,7 +29,6 @@ export function AdminPageClient({
   const handleAddItem = (data: {
     name: string;
     link?: string;
-    price?: string;
     notes?: string;
   }) => {
     // TODO: Add item to mock store (Phase 1.3)
