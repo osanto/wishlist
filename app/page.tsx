@@ -1,8 +1,12 @@
 import Link from "next/link";
 
+import { AppHeader } from "@/components/app-header";
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8">
+    <>
+      <AppHeader />
+      <main className="flex min-h-screen flex-col items-center justify-center p-8">
       <div className="max-w-md w-full space-y-8 text-center">
         <div className="space-y-4">
           <h1 className="text-5xl font-bold tracking-tight">Wishlist</h1>
@@ -29,5 +33,6 @@ export default function Home() {
         </div>
       </div>
     </main>
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import { AppHeader } from "@/components/app-header";
 import { GuestItemsList } from "@/components/guest-items-list";
 import { PageHeader } from "@/components/page-header";
 
@@ -51,32 +52,35 @@ export default async function GuestPage({ params }: GuestPageProps) {
   const { guestToken: _guestToken } = await params;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-4xl p-6 space-y-8">
+    <>
+      <AppHeader />
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-4xl p-6 space-y-8">
         <PageHeader
           title={mockWishlist.title}
           description={mockWishlist.description}
         />
 
-        {/* Items Section */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Items</h2>
+          {/* Items Section */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold">Items</h2>
 
-          {mockItems.length === 0 ? (
-            <div className="rounded-lg border border-dashed p-12 text-center">
-              <h3 className="text-lg font-medium">No items yet</h3>
-              <p className="text-sm text-muted-foreground mt-2">
-                The wishlist owner hasn&apos;t added any items yet
-              </p>
-            </div>
-          ) : (
-            <GuestItemsList
-              items={mockItems}
-              currentUserReservationToken={currentUserReservationToken}
-            />
-          )}
+            {mockItems.length === 0 ? (
+              <div className="rounded-lg border border-dashed p-12 text-center">
+                <h3 className="text-lg font-medium">No items yet</h3>
+                <p className="text-sm text-muted-foreground mt-2">
+                  The wishlist owner hasn&apos;t added any items yet
+                </p>
+              </div>
+            ) : (
+              <GuestItemsList
+                items={mockItems}
+                currentUserReservationToken={currentUserReservationToken}
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

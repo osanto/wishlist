@@ -1,9 +1,9 @@
 "use client";
 
-import { Pencil1Icon } from "@radix-ui/react-icons";
 import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { Pencil1Icon } from "@radix-ui/react-icons";
+
 import { EditWishlistDialog } from "@/components/edit-wishlist-dialog";
 import { ShareLinkSection } from "@/components/share-link-section";
 

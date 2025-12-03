@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 
 import { AdminPageClient } from "@/components/admin-page-client";
 import { AdminPageHeader } from "@/components/admin-page-header";
+import { AppHeader } from "@/components/app-header";
 
 export const metadata: Metadata = {
   title: "Manage Wishlist | Wishlist",
@@ -54,13 +55,16 @@ export default async function AdminPage({ params }: AdminPageProps) {
   const guestUrl = `${protocol}://${host}/guest/${mockWishlist.guestToken}`;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-4xl p-6 space-y-8">
+    <>
+      <AppHeader />
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-4xl p-6 space-y-8">
         <AdminPageHeader wishlist={mockWishlist} shareUrl={guestUrl} />
 
-        {/* Items Section */}
-        <AdminPageClient items={mockItems} guestUrl={guestUrl} />
+          {/* Items Section */}
+          <AdminPageClient items={mockItems} guestUrl={guestUrl} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
