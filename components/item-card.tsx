@@ -5,7 +5,6 @@ interface ItemCardProps {
     id: string;
     name: string;
     link?: string;
-    price?: string;
     notes?: string;
     isReserved: boolean;
   };
@@ -58,7 +57,6 @@ export function ItemCard({
                 </span>
               )}
           </div>
-          {item.price && <p className="text-sm font-medium">{item.price}</p>}
           {item.link && (
             <a
               href={item.link}

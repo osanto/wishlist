@@ -9,7 +9,6 @@ interface Item {
   id: string;
   name: string;
   link?: string;
-  price?: string;
   notes?: string;
   isReserved: boolean;
   reservedByToken: string | null;
