@@ -1,5 +1,7 @@
 "use client";
 
+import { use } from "react";
+
 import { ItemCard } from "@/components/item-card";
 
 // Mock data for Phase 1
@@ -37,8 +39,8 @@ interface AdminPageProps {
   }>;
 }
 
-export default async function AdminPage({ params }: AdminPageProps) {
-  const { adminToken: _adminToken } = await params;
+export default function AdminPage({ params }: AdminPageProps) {
+  const { adminToken: _adminToken } = use(params);
 
   const guestUrl =
     typeof window !== "undefined"
