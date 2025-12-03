@@ -2,7 +2,7 @@ import { type Metadata } from "next";
 import { headers } from "next/headers";
 
 import { AdminPageClient } from "@/components/admin-page-client";
-import { PageHeader } from "@/components/page-header";
+import { AdminPageHeader } from "@/components/admin-page-header";
 
 export const metadata: Metadata = {
   title: "Manage Wishlist | Wishlist",
@@ -56,11 +56,7 @@ export default async function AdminPage({ params }: AdminPageProps) {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl p-6 space-y-8">
-        <PageHeader
-          title={mockWishlist.title}
-          description={mockWishlist.description}
-          shareUrl={guestUrl}
-        />
+        <AdminPageHeader wishlist={mockWishlist} shareUrl={guestUrl} />
 
         {/* Items Section */}
         <AdminPageClient items={mockItems} guestUrl={guestUrl} />
