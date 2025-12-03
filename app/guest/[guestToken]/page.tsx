@@ -1,4 +1,5 @@
 import { GuestItemsList } from "@/components/guest-items-list";
+import { PageHeader } from "@/components/page-header";
 
 // Mock data for Phase 1
 const mockWishlist = {
@@ -52,13 +53,10 @@ export default async function GuestPage({ params }: GuestPageProps) {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl p-6 space-y-8">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold" data-test-id="wishlist-title">
-            {mockWishlist.title}
-          </h1>
-          <p className="text-muted-foreground">{mockWishlist.description}</p>
-        </div>
+        <PageHeader
+          title={mockWishlist.title}
+          description={mockWishlist.description}
+        />
 
         {/* Items Section */}
         <div className="space-y-4">

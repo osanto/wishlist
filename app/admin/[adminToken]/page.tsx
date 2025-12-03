@@ -1,6 +1,8 @@
 import { type Metadata } from "next";
+import { headers } from "next/headers";
 
 import { AdminPageClient } from "@/components/admin-page-client";
+import { PageHeader } from "@/components/page-header";
 
 export const metadata: Metadata = {
   title: "Manage Wishlist | Wishlist",
@@ -45,41 +47,20 @@ interface AdminPageProps {
 export default async function AdminPage({ params }: AdminPageProps) {
   const { adminToken: _adminToken } = await params;
 
-  const guestUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/guest/${mockWishlist.guestToken}`
-      : `/guest/${mockWishlist.guestToken}`;
+  // Get the origin from headers for the full URL
+  const headersList = await headers();
+  const host = headersList.get("host") || "localhost:3000";
+  const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+  const guestUrl = `${protocol}://${host}/guest/${mockWishlist.guestToken}`;
 
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl p-6 space-y-8">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold" data-test-id="wishlist-title">
-            {mockWishlist.title}
-          </h1>
-          <p className="text-muted-foreground">{mockWishlist.description}</p>
-        </div>
-
-        {/* Share Link Section */}
-        <div className="rounded-lg border bg-card p-6 space-y-4">
-          <h2 className="text-lg font-semibold">Share with Guests</h2>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              readOnly
-              value={guestUrl}
-              className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
-              data-test-id="guest-link-input"
-            />
-            <button
-              data-test-id="copy-link-button"
-              className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-            >
-              Copy Link
-            </button>
-          </div>
-        </div>
+        <PageHeader
+          title={mockWishlist.title}
+          description={mockWishlist.description}
+          shareUrl={guestUrl}
+        />
 
         {/* Items Section */}
         <AdminPageClient items={mockItems} guestUrl={guestUrl} />
