@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { CancelReservationDialog } from "@/components/cancel-reservation-dialog";
 import { ItemCard } from "@/components/item-card";
 import { ReserveItemModal } from "@/components/reserve-item-modal";
 
@@ -25,6 +26,8 @@ export function GuestItemsList({
 }: GuestItemsListProps) {
   const [reservingItem, setReservingItem] = useState<Item | null>(null);
   const [isReserveModalOpen, setIsReserveModalOpen] = useState(false);
+  const [cancellingItem, setCancellingItem] = useState<Item | null>(null);
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
 
   const handleReserve = (item: Item) => {
     setReservingItem(item);
@@ -34,6 +37,16 @@ export function GuestItemsList({
   const handleReserveConfirm = (itemId: string) => {
     // TODO: Reserve item in mock store (Phase 1.3)
     console.log("Reserve item:", itemId);
+  };
+
+  const handleCancelReservation = (item: Item) => {
+    setCancellingItem(item);
+    setIsCancelDialogOpen(true);
+  };
+
+  const handleCancelReservationConfirm = (itemId: string) => {
+    // TODO: Cancel reservation in mock store (Phase 1.3)
+    console.log("Cancel reservation:", itemId);
   };
 
   return (
@@ -64,9 +77,7 @@ export function GuestItemsList({
               variant="guest"
               reservationStatus={reservationStatus}
               onReserve={() => handleReserve(item)}
-              onCancelReservation={() => {
-                // TODO: Handle cancel reservation
-              }}
+              onCancelReservation={() => handleCancelReservation(item)}
             />
           );
         })}
@@ -77,6 +88,13 @@ export function GuestItemsList({
         onOpenChange={setIsReserveModalOpen}
         item={reservingItem}
         onReserve={handleReserveConfirm}
+      />
+
+      <CancelReservationDialog
+        open={isCancelDialogOpen}
+        onOpenChange={setIsCancelDialogOpen}
+        item={cancellingItem}
+        onCancelReservation={handleCancelReservationConfirm}
       />
     </>
   );
