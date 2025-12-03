@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { DeleteItemDialog } from "@/components/delete-item-dialog";
 import { EditItemDialog } from "@/components/edit-item-dialog";
 import { ItemCard } from "@/components/item-card";
 
@@ -22,6 +23,8 @@ interface AdminItemsListProps {
 export function AdminItemsList({ items }: AdminItemsListProps) {
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [deletingItem, setDeletingItem] = useState<Item | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleEdit = (item: Item) => {
     setEditingItem(item);
@@ -37,6 +40,16 @@ export function AdminItemsList({ items }: AdminItemsListProps) {
     console.log("Edit item:", itemId, data);
   };
 
+  const handleDelete = (item: Item) => {
+    setDeletingItem(item);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = (itemId: string) => {
+    // TODO: Delete item from mock store (Phase 1.3)
+    console.log("Delete item:", itemId);
+  };
+
   return (
     <>
       <div className="space-y-4">
@@ -46,9 +59,7 @@ export function AdminItemsList({ items }: AdminItemsListProps) {
             item={item}
             variant="admin"
             onEdit={() => handleEdit(item)}
-            onDelete={() => {
-              // TODO: Open delete dialog
-            }}
+            onDelete={() => handleDelete(item)}
           />
         ))}
       </div>
@@ -58,6 +69,13 @@ export function AdminItemsList({ items }: AdminItemsListProps) {
         onOpenChange={setIsEditDialogOpen}
         item={editingItem}
         onEdit={handleEditSubmit}
+      />
+
+      <DeleteItemDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        item={deletingItem}
+        onDelete={handleDeleteConfirm}
       />
     </>
   );
