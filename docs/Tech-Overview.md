@@ -62,7 +62,6 @@ Supports both single and multiple wishlists with no changes later.
 | `name`              | text            | Item name                                  |
 | `link`              | text            | Optional                                   |
 | `image_url`         | text            | Optional                                   |
-| `price`             | text            | Optional, display-only (e.g., "$50")       |
 | `notes`             | text            | Optional                                   |
 | `reserved_by_token` | text (nullable) | Guest reservation token (NULL = available) |
 | `is_reserved`       | boolean         | Convenience boolean                        |

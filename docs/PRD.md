@@ -88,7 +88,7 @@ Guest identity is stored locally using a **local reservation token** (localStora
 2. See wishlist title + description + items
 3. Admin can:
    - Add new wishlist items
-   - Edit name, link, price, notes
+   - Edit name, link, notes
    - Delete item
 4. Admin sees reservation state:
    - Reserved / Not reserved
@@ -100,7 +100,6 @@ Guest identity is stored locally using a **local reservation token** (localStora
 2. Sees wishlist items with:
    - Name
    - Link
-   - Price
    - Notes
    - Reservation status
 3. Guest can:
@@ -133,11 +132,10 @@ Guest identity is stored locally using a **local reservation token** (localStora
 
 - **Name** - Required
 - **Link (URL)** - Optional, opens in new tab when clicked
-- **Price** - Optional, display-only text (e.g., "$50")
 - **Notes** - Optional, additional details
 - **Reservation Status** - System-managed (Reserved/Available)
 
-**Note:** Images and auto-price fetching are out of scope for MVP
+**Note:** Images are out of scope for MVP
 
 ### **URL Structure**
 
@@ -223,7 +221,6 @@ Guests can reserve **multiple** items. Reservations are tracked anonymously by t
 The following features are intentionally excluded:
 
 - ❌ Auto-fetch images from product URLs
-- ❌ Auto-fetch prices from product URLs
 - ❌ Multiple wishlists per user (schema supports it, but UI doesn't expose it yet)
 - ❌ Item quantities (e.g., "need 3 of these")
 - ❌ User accounts or authentication
