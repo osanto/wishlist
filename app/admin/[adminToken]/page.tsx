@@ -1,4 +1,4 @@
-import { ItemCard } from "@/components/item-card";
+import { AdminItemsList } from "@/components/admin-items-list";
 
 // Mock data for Phase 1
 const mockWishlist = {
@@ -97,21 +97,7 @@ export default async function AdminPage({ params }: AdminPageProps) {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {mockItems.map((item) => (
-                <ItemCard
-                  key={item.id}
-                  item={item}
-                  variant="admin"
-                  onEdit={() => {
-                    // TODO: Open edit dialog
-                  }}
-                  onDelete={() => {
-                    // TODO: Open delete dialog
-                  }}
-                />
-              ))}
-            </div>
+            <AdminItemsList items={mockItems} />
           )}
         </div>
       </div>
