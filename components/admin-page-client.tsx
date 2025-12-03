@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { AddItemDialog } from "@/components/add-item-dialog";
 import { AdminItemsList } from "@/components/admin-items-list";
+import { EmptyState } from "@/components/empty-state";
 
 interface Item {
   id: string;
@@ -50,15 +51,11 @@ export function AdminPageClient({
         </div>
 
         {items.length === 0 ? (
-          <div
-            className="rounded-lg border border-dashed p-12 text-center"
-            data-test-id="empty-state"
-          >
-            <h3 className="text-lg font-medium">No items yet</h3>
-            <p className="text-sm text-muted-foreground mt-2">
-              Click &quot;Add Item&quot; to start building your wishlist
-            </p>
-          </div>
+          <EmptyState
+            title="No items yet"
+            description='Click "Add Item" to start building your wishlist'
+            testId="empty-state"
+          />
         ) : (
           <AdminItemsList items={items} />
         )}

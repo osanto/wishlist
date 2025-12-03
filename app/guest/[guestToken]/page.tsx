@@ -1,6 +1,14 @@
+import { type Metadata } from "next";
+
 import { AppHeader } from "@/components/app-header";
+import { EmptyState } from "@/components/empty-state";
 import { GuestItemsList } from "@/components/guest-items-list";
 import { PageHeader } from "@/components/page-header";
+
+export const metadata: Metadata = {
+  title: "Wishlist",
+  description: "View and reserve wishlist items",
+};
 
 // Mock data for Phase 1
 const mockWishlist = {
@@ -66,12 +74,10 @@ export default async function GuestPage({ params }: GuestPageProps) {
             <h2 className="text-2xl font-semibold">Items</h2>
 
             {mockItems.length === 0 ? (
-              <div className="rounded-lg border border-dashed p-12 text-center">
-                <h3 className="text-lg font-medium">No items yet</h3>
-                <p className="text-sm text-muted-foreground mt-2">
-                  The wishlist owner hasn&apos;t added any items yet
-                </p>
-              </div>
+              <EmptyState
+                title="No items yet"
+                description="The wishlist owner hasn't added any items yet"
+              />
             ) : (
               <GuestItemsList
                 items={mockItems}
