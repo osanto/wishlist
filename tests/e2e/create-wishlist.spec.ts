@@ -111,4 +111,98 @@ test.describe("Create Wishlist Flow", () => {
     await deleteWishlistAction(adminToken1);
     await deleteWishlistAction(adminToken2);
   });
+
+  test("admin page shows 404 for invalid token", async ({ page }) => {
+    // 1. Visit admin page with fake/invalid token
+    const fakeAdminToken = "invalid-token-that-does-not-exist";
+    await page.goto(`/admin/${fakeAdminToken}`);
+    await page.waitForLoadState("networkidle");
+
+    // 2. Assert: 404 page is shown
+    // Check for Next.js default 404 page elements
+    const pageContent = await page.textContent("body");
+    
+    expect(pageContent).toContain("404");
+    
+    // 3. Assert: Wishlist data is NOT shown
+    // The wishlist title element should not exist
+    const wishlistTitle = page.getByTestId("wishlist-title");
+    await expect(wishlistTitle).not.toBeVisible();
+  });
+
+  test("guest can access wishlist page but not see admin controls", async ({ page, context }) => {
+    let adminToken: string | null = null;
+
+    try {
+      // 1. Create wishlist as admin
+      await page.goto("/", { waitUntil: "networkidle" });
+      const createButton = page.getByRole('button', { name: 'Create Wishlist' });
+      await expect(createButton).toBeVisible({ timeout: 15000 });
+      await createButton.click();
+      await page.waitForURL(/\/admin\/[a-f0-9-]+/, { timeout: 15000 });
+
+      // 2. Extract admin token from URL
+      const adminUrl = page.url();
+      const adminMatch = adminUrl.match(/\/admin\/([0-9a-f-]{36})/);
+      adminToken = adminMatch ? adminMatch[1] : null;
+      expect(adminToken).not.toBeNull();
+
+      // 3. Get guest token from database
+      const { data: wishlist } = await supabase
+        .from("wishlist")
+        .select("guest_token")
+        .eq("admin_token", adminToken)
+        .single();
+
+      expect(wishlist).toBeDefined();
+      expect(wishlist?.guest_token).toBeDefined();
+      const guestToken = wishlist?.guest_token;
+
+      // 4. Verify guest token is a valid UUID
+      expect(guestToken).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+
+      // 5. Verify admin and guest tokens are different
+      expect(guestToken).not.toBe(adminToken);
+
+      // 6. Open guest page in new browser context (simulates different user)
+      const guestPage = await context.newPage();
+      await guestPage.goto(`/guest/${guestToken}`, { waitUntil: "domcontentloaded" });
+
+      // 7. Assert: Guest page loads successfully (shows mock data for now)
+      // Wait for title using text content (more reliable for hydration)
+      await expect(guestPage.getByRole('heading', { name: /My Wishlist/i })).toBeVisible({ timeout: 15000 });
+      await expect(guestPage).toHaveTitle(/Wishlist/i);
+
+      // 8. Verify guest does NOT see admin controls
+      const addItemButton = guestPage.getByTestId("add-item-button");
+      await expect(addItemButton).not.toBeVisible();
+
+      // 9. Verify guest does NOT see edit wishlist button
+      const editWishlistButton = guestPage.getByTestId("edit-wishlist-button");
+      await expect(editWishlistButton).not.toBeVisible();
+
+      // 10. Verify guest does NOT see "Share with Guests" section
+      const shareSection = guestPage.getByText(/Share with Guests/i);
+      await expect(shareSection).not.toBeVisible();
+
+      // 11. Verify guest does NOT see copy link button
+      const copyLinkButton = guestPage.getByTestId("copy-link-button");
+      await expect(copyLinkButton).not.toBeVisible();
+
+      // 12. Verify guest does NOT see edit/delete buttons for items
+      const editItemButton = guestPage.getByTestId("edit-item-button");
+      await expect(editItemButton).not.toBeVisible();
+      
+      const deleteItemButton = guestPage.getByTestId("delete-item-button");
+      await expect(deleteItemButton).not.toBeVisible();
+
+      // Cleanup guest page
+      await guestPage.close();
+    } finally {
+      // Cleanup wishlist
+      if (adminToken) {
+        await deleteWishlistAction(adminToken);
+      }
+    }
+  });
 });
