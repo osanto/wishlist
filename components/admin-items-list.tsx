@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 import { DeleteItemDialog } from "@/components/delete-item-dialog";
 import { EditItemDialog } from "@/components/edit-item-dialog";
 import { ItemCard } from "@/components/item-card";
+import { editItemAction } from "@/app/actions/items";
 
 interface Item {
   id: string;
@@ -17,26 +18,47 @@ interface Item {
 
 interface AdminItemsListProps {
   items: Item[];
+  adminToken: string;
 }
 
-export function AdminItemsList({ items }: AdminItemsListProps) {
+export function AdminItemsList({ items, adminToken }: AdminItemsListProps) {
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState<Item | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const handleEdit = (item: Item) => {
     setEditingItem(item);
     setIsEditDialogOpen(true);
   };
 
-  const handleEditSubmit = (itemId: string, data: {
-    name: string;
-    link?: string;
-    notes?: string;
-  }) => {
-    // TODO: Update item in mock store (Phase 1.3)
-    console.log("Edit item:", itemId, data);
+  const handleEditSubmit = async (
+    itemId: string,
+    data: {
+      name: string;
+      link?: string;
+      notes?: string;
+    }
+  ) => {
+    startTransition(async () => {
+      const result = await editItemAction(adminToken, {
+        itemId,
+        name: data.name,
+        link: data.link || "",
+        notes: data.notes || "",
+      });
+
+      if (result.error) {
+        // TODO: Show error toast
+        console.error("Error editing item:", result.error);
+        alert(`Error: ${result.error}`);
+      } else {
+        // Success - page will automatically refresh due to revalidatePath
+        console.log("Item updated successfully:", result.data);
+        setIsEditDialogOpen(false);
+      }
+    });
   };
 
   const handleDelete = (item: Item) => {

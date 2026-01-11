@@ -74,7 +74,7 @@ export function AdminPageClient({
             testId="empty-state"
           />
         ) : (
-          <AdminItemsList items={items} />
+          <AdminItemsList items={items} adminToken={adminToken} />
         )}
       </div>
 
