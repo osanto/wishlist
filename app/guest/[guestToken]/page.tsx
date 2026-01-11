@@ -1,22 +1,18 @@
 import { type Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import { AppHeader } from "@/components/app-header";
 import { EmptyState } from "@/components/empty-state";
 import { GuestItemsList } from "@/components/guest-items-list";
 import { PageHeader } from "@/components/page-header";
+import { getWishlistByGuestToken } from "@/lib/wishlist";
 
 export const metadata: Metadata = {
   title: "Wishlist",
   description: "View and reserve wishlist items",
 };
 
-// Mock data for Phase 1
-const mockWishlist = {
-  id: "mock-wishlist-id",
-  title: "My Wishlist",
-  description: "Things I'd love to receive!",
-};
-
+// Mock items for Phase 1 (will be replaced with real items later)
 const mockItems = [
   {
     id: "1",
@@ -57,7 +53,15 @@ interface GuestPageProps {
 }
 
 export default async function GuestPage({ params }: GuestPageProps) {
-  const { guestToken: _guestToken } = await params;
+  const { guestToken } = await params;
+
+  // Fetch real wishlist data from database
+  const wishlist = await getWishlistByGuestToken(guestToken);
+
+  // Show 404 if wishlist not found
+  if (!wishlist) {
+    notFound();
+  }
 
   return (
     <>
@@ -65,8 +69,8 @@ export default async function GuestPage({ params }: GuestPageProps) {
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-4xl p-6 space-y-8">
         <PageHeader
-          title={mockWishlist.title}
-          description={mockWishlist.description}
+          title={wishlist.title}
+          description={wishlist.description || undefined}
         />
 
           {/* Items Section */}

@@ -21,3 +21,24 @@ export async function getWishlistByAdminToken(
 
   return data;
 }
+
+/**
+ * Fetches a wishlist by guest token.
+ * Returns the wishlist data or null if not found.
+ */
+export async function getWishlistByGuestToken(
+  guestToken: string
+): Promise<Wishlist | null> {
+  const { data, error } = await supabase
+    .from("wishlist")
+    .select("*")
+    .eq("guest_token", guestToken)
+    .single();
+
+  if (error || !data) {
+    console.error("Error fetching wishlist:", error);
+    return null;
+  }
+
+  return data;
+}
