@@ -145,3 +145,58 @@ export async function editItemAction(
     return { error: "Failed to update item" };
   }
 }
+
+/**
+ * Deletes an item from a wishlist.
+ * Validates admin token and item ownership before deleting.
+ */
+export async function deleteItemAction(
+  adminToken: string,
+  itemId: string
+): Promise<ActionResponse<void>> {
+  try {
+    // Validate admin token and get wishlist ID
+    const { data: wishlist, error: wishlistError } = await supabase
+      .from("wishlist")
+      .select("id")
+      .eq("admin_token", adminToken)
+      .single();
+
+    if (wishlistError || !wishlist) {
+      console.error("Error validating admin token for delete:", wishlistError);
+      return { error: "Invalid admin token" };
+    }
+
+    // Verify item belongs to this wishlist
+    const { data: existingItem, error: itemError } = await supabase
+      .from("items")
+      .select("id")
+      .eq("id", itemId)
+      .eq("wishlist_id", wishlist.id)
+      .single();
+
+    if (itemError || !existingItem) {
+      console.error("Error finding item for delete:", itemError);
+      return { error: "Item not found or does not belong to this wishlist" };
+    }
+
+    // Delete the item
+    const { error: deleteError } = await supabase
+      .from("items")
+      .delete()
+      .eq("id", itemId);
+
+    if (deleteError) {
+      console.error("Error deleting item:", deleteError);
+      return { error: "Failed to delete item" };
+    }
+
+    // Revalidate the admin page
+    revalidatePath(`/admin/${adminToken}`);
+
+    return { data: undefined };
+  } catch (error) {
+    console.error("Unexpected error in deleteItemAction:", error);
+    return { error: "An unexpected error occurred." };
+  }
+}
