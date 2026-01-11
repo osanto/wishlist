@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import { DeleteItemDialog } from "@/components/delete-item-dialog";
 import { EditItemDialog } from "@/components/edit-item-dialog";
 import { ItemCard } from "@/components/item-card";
-import { editItemAction } from "@/app/actions/items";
+import { editItemAction, deleteItemAction } from "@/app/actions/items";
 
 interface Item {
   id: string;
@@ -66,9 +66,18 @@ export function AdminItemsList({ items, adminToken }: AdminItemsListProps) {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = (itemId: string) => {
-    // TODO: Delete item from mock store (Phase 1.3)
-    console.log("Delete item:", itemId);
+  const handleDeleteConfirm = async (itemId: string) => {
+    startTransition(async () => {
+      const result = await deleteItemAction(adminToken, itemId);
+
+      if (result.error) {
+        console.error("Error deleting item:", result.error);
+        alert(`Error: ${result.error}`);
+      } else {
+        console.log("Item deleted successfully");
+        setIsDeleteDialogOpen(false);
+      }
+    });
   };
 
   return (
