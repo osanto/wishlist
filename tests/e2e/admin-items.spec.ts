@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 
 test.describe("Admin Item Management", () => {
   test("admin can add an item to wishlist", async ({
+    context,
     homePage,
     adminPage,
     addItemDialog,
@@ -21,10 +22,19 @@ test.describe("Admin Item Management", () => {
     // 3. Wait for page to fully load
     await adminPage.waitForLoad();
 
-    // 4. Open add item dialog
+    // 4. Get guest token from database
+    const { data: wishlist } = await supabase
+      .from("wishlist")
+      .select("guest_token")
+      .eq("admin_token", adminToken)
+      .single();
+    const guestToken = wishlist?.guest_token;
+    expect(guestToken).not.toBeNull();
+
+    // 5. Open add item dialog
     await adminPage.clickAddItem();
 
-    // 5. Fill in item details and submit
+    // 6. Fill in item details and submit
     await addItemDialog.fillForm({
       name: "Wireless Headphones",
       link: "https://example.com/headphones",
@@ -32,12 +42,22 @@ test.describe("Admin Item Management", () => {
     });
     await addItemDialog.submitAndWaitForClose();
 
-    // 6. Verify item appears on the page
+    // 7. Verify item appears in admin view
     await adminPage.expectItemVisible("Wireless Headphones");
+
+    // 8. Verify item also appears in guest view
+    const guestPage = await context.newPage();
+    await guestPage.goto(`/guest/${guestToken}`);
+    await guestPage.waitForLoadState("networkidle");
+    await expect(guestPage.getByText("Wireless Headphones")).toBeVisible();
+
+    // Cleanup
+    await guestPage.close();
   });
 
   test("admin can edit an item", async ({
     page,
+    context,
     homePage,
     adminPage,
     addItemDialog,
@@ -53,7 +73,16 @@ test.describe("Admin Item Management", () => {
     createdWishlists.push(adminToken!);
     await adminPage.waitForLoad();
 
-    // 2. Add initial item
+    // 2. Get guest token from database
+    const { data: wishlist } = await supabase
+      .from("wishlist")
+      .select("guest_token")
+      .eq("admin_token", adminToken)
+      .single();
+    const guestToken = wishlist?.guest_token;
+    expect(guestToken).not.toBeNull();
+
+    // 3. Add initial item
     await adminPage.clickAddItem();
     await addItemDialog.fillForm({
       name: "Original Item",
@@ -63,10 +92,10 @@ test.describe("Admin Item Management", () => {
     await addItemDialog.submitAndWaitForClose();
     await adminPage.expectItemVisible("Original Item");
 
-    // 3. Click edit button on the item
+    // 4. Click edit button on the item
     await adminPage.clickEditItemButton();
 
-    // 4. Update the item in the edit dialog
+    // 5. Update the item in the edit dialog
     await editItemDialog.fillForm({
       name: "Updated Item",
       link: "https://example.com/updated",
@@ -74,20 +103,39 @@ test.describe("Admin Item Management", () => {
     });
     await editItemDialog.submitAndWaitForClose();
 
-    // 5. Verify updated item appears on the page
+    // 6. Verify updated item appears in admin view
     await adminPage.expectItemVisible("Updated Item");
     
-    // 6. Verify original name is no longer visible
+    // 7. Verify original name is no longer visible in admin view
     await expect(page.getByText("Original Item")).not.toBeVisible();
 
-    // 7. Verify updated link and notes are present in the page content
+    // 8. Verify updated link and notes are present in admin view
     const pageContent = await page.content();
     expect(pageContent).toContain("https://example.com/updated");
     expect(pageContent).toContain("Updated notes");
     
-    // 8. Verify original link and notes are no longer present
+    // 9. Verify original link and notes are no longer present in admin view
     expect(pageContent).not.toContain("https://example.com/original");
     expect(pageContent).not.toContain("Original notes");
+
+    // 10. Verify updated item also appears in guest view
+    const guestPage = await context.newPage();
+    await guestPage.goto(`/guest/${guestToken}`);
+    await guestPage.waitForLoadState("networkidle");
+    await expect(guestPage.getByText("Updated Item")).toBeVisible();
+    
+    // 11. Verify original item name is not visible in guest view
+    await expect(guestPage.getByText("Original Item")).not.toBeVisible();
+
+    // 12. Verify updated link and notes in guest view
+    const guestPageContent = await guestPage.content();
+    expect(guestPageContent).toContain("https://example.com/updated");
+    expect(guestPageContent).toContain("Updated notes");
+    expect(guestPageContent).not.toContain("https://example.com/original");
+    expect(guestPageContent).not.toContain("Original notes");
+
+    // Cleanup
+    await guestPage.close();
   });
 
   test("admin can delete an item", async ({
@@ -128,7 +176,7 @@ test.describe("Admin Item Management", () => {
 
     // 4. Open guest page in a new tab to verify item is visible
     const guestPage = await context.newPage();
-    await guestPage.goto(`http://localhost:3000/guest/${guestToken}`);
+    await guestPage.goto(`/guest/${guestToken}`);
     await guestPage.waitForLoadState("networkidle");
     await expect(guestPage.getByText("Item to Delete")).toBeVisible();
 
