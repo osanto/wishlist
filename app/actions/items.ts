@@ -68,3 +68,80 @@ export async function addItemAction(
     return { error: "Failed to add item" };
   }
 }
+
+interface EditItemInput {
+  itemId: string;
+  name: string;
+  link: string;
+  notes: string;
+}
+
+/**
+ * Edits an existing item in a wishlist.
+ * Validates admin token before editing.
+ */
+export async function editItemAction(
+  adminToken: string,
+  itemData: EditItemInput
+): Promise<ActionResponse<Item>> {
+  try {
+    // Validate input
+    const trimmedName = itemData.name.trim();
+    if (!trimmedName) {
+      return { error: "Item name is required" };
+    }
+
+    // Validate admin token and get wishlist ID
+    const { data: wishlist, error: wishlistError } = await supabase
+      .from("wishlist")
+      .select("id")
+      .eq("admin_token", adminToken)
+      .single();
+
+    if (wishlistError || !wishlist) {
+      console.error("Error validating admin token:", wishlistError);
+      return { error: "Invalid admin token" };
+    }
+
+    // Verify item belongs to this wishlist
+    const { data: existingItem, error: itemError } = await supabase
+      .from("items")
+      .select("wishlist_id")
+      .eq("id", itemData.itemId)
+      .single();
+
+    if (itemError || !existingItem) {
+      console.error("Error fetching item:", itemError);
+      return { error: "Item not found" };
+    }
+
+    if (existingItem.wishlist_id !== wishlist.id) {
+      return { error: "Item does not belong to this wishlist" };
+    }
+
+    // Update item in database
+    const { data: updatedItem, error: updateError } = await supabase
+      .from("items")
+      .update({
+        name: trimmedName,
+        link: itemData.link.trim() || null,
+        notes: itemData.notes.trim() || null,
+      })
+      .eq("id", itemData.itemId)
+      .select()
+      .single();
+
+    if (updateError || !updatedItem) {
+      console.error("Error updating item:", updateError);
+      return { error: "Failed to update item" };
+    }
+
+    // Revalidate the admin page to show the updated item
+    revalidatePath(`/admin/${adminToken}`);
+
+    return { data: updatedItem };
+  } catch (error) {
+    console.error("Error in editItemAction:", error);
+    return { error: "Failed to update item" };
+  }
+}
