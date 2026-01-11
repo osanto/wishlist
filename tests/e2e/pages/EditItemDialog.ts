@@ -1,8 +1,8 @@
 import { Page } from "@playwright/test";
 import { ItemDialogBase } from "./ItemDialogBase";
 
-export class AddItemDialog extends ItemDialogBase {
+export class EditItemDialog extends ItemDialogBase {
   constructor(page: Page) {
-    super(page, "item");
+    super(page, "edit-item");
   }
 }

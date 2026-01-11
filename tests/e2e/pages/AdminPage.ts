@@ -43,6 +43,13 @@ export class AdminPage {
     await this.addItemButton.click({ force: true }); // Force click to bypass hydration issues
   }
 
+  async clickEditItemButton() {
+    // Click the first edit button (using partial match for dynamic ID)
+    const editButton = this.page.locator('[data-test-id^="edit-item-"]').first();
+    await editButton.waitFor({ state: "visible", timeout: 10000 });
+    await editButton.click({ force: true });
+  }
+
   async expectItemVisible(itemName: string) {
     await expect(this.page.getByText(itemName)).toBeVisible({
       timeout: 10000,
