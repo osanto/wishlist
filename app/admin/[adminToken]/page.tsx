@@ -59,7 +59,8 @@ export default async function AdminPage({ params }: AdminPageProps) {
             title: wishlist.title,
             description: wishlist.description || undefined,
           }} 
-          shareUrl={guestUrl} 
+          shareUrl={guestUrl}
+          adminToken={adminToken}
         />
 
           {/* Items Section - now using real data from database */}
