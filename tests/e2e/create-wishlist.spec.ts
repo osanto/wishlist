@@ -160,4 +160,73 @@ test.describe("Create Wishlist Flow", () => {
     // Cleanup
     await guestPageContext.close();
   });
+
+  test("admin can edit wishlist title and description", async ({
+    context,
+    homePage,
+    adminPage,
+    editWishlistDialog,
+    createdWishlists,
+  }) => {
+    // 1. Create wishlist
+    await homePage.goto();
+    await homePage.clickCreateWishlist();
+    await adminPage.expectToBeOnAdminPage();
+    await adminPage.waitForLoad();
+
+    // 2. Extract admin token
+    const adminToken = await adminPage.getAdminTokenFromUrl();
+    expect(adminToken).not.toBeNull();
+    createdWishlists.push(adminToken!);
+
+    // 3. Verify default title
+    await adminPage.expectWishlistTitle("My Wishlist");
+
+    // 4. Get guest token from database
+    const { data: wishlist } = await supabase
+      .from("wishlist")
+      .select("guest_token")
+      .eq("admin_token", adminToken)
+      .single();
+    const guestToken = wishlist?.guest_token;
+    expect(guestToken).not.toBeNull();
+
+    // 5. Open edit wishlist dialog
+    await adminPage.clickEditWishlist();
+    await editWishlistDialog.expectDialogOpen();
+
+    // 6. Edit title and description
+    await editWishlistDialog.fillForm({
+      title: "Birthday Wishlist 2026",
+      description: "Things I'd love for my birthday!",
+    });
+    await editWishlistDialog.submitAndWaitForClose();
+
+    // 7. Verify updated title appears in admin view
+    await adminPage.expectWishlistTitle("Birthday Wishlist 2026");
+
+    // 8. Verify changes persist in database
+    const { data: updatedWishlist } = await supabase
+      .from("wishlist")
+      .select("title, description")
+      .eq("admin_token", adminToken)
+      .single();
+
+    expect(updatedWishlist?.title).toBe("Birthday Wishlist 2026");
+    expect(updatedWishlist?.description).toBe("Things I'd love for my birthday!");
+
+    // 9. Verify updated title also appears in guest view
+    const guestPageContext = await context.newPage();
+    await guestPageContext.goto(`/guest/${guestToken}`, {
+      waitUntil: "networkidle",
+    });
+
+    const guestWishlistTitle = guestPageContext.locator(
+      '[data-test-id="wishlist-title"]'
+    );
+    await expect(guestWishlistTitle).toHaveText("Birthday Wishlist 2026");
+
+    // Cleanup
+    await guestPageContext.close();
+  });
 });
