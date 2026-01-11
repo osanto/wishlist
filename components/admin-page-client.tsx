@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 import { AddItemDialog } from "@/components/add-item-dialog";
 import { AdminItemsList } from "@/components/admin-items-list";
 import { EmptyState } from "@/components/empty-state";
+import { addItemAction } from "@/app/actions/items";
 
 interface Item {
   id: string;
@@ -18,22 +19,38 @@ interface Item {
 interface AdminPageClientProps {
   items: Item[];
   guestUrl: string;
+  adminToken: string;
 }
 
 export function AdminPageClient({
   items,
   guestUrl: _guestUrl,
+  adminToken,
 }: AdminPageClientProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  const handleAddItem = (data: {
+  const handleAddItem = async (data: {
     name: string;
     link?: string;
     notes?: string;
   }) => {
-    // TODO: Add item to mock store (Phase 1.3)
-    console.log("Add item:", data);
-    // Dialog will close automatically
+    startTransition(async () => {
+      const result = await addItemAction(adminToken, {
+        name: data.name,
+        link: data.link || "",
+        notes: data.notes || "",
+      });
+
+      if (result.error) {
+        // TODO: Show error toast
+        console.error("Error adding item:", result.error);
+        alert(`Error: ${result.error}`);
+      } else {
+        // Success - page will automatically refresh due to revalidatePath
+        console.log("Item added successfully:", result.data);
+      }
+    });
   };
 
   return (

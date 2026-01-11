@@ -63,7 +63,7 @@ export default async function AdminPage({ params }: AdminPageProps) {
         />
 
           {/* Items Section - now using real data from database */}
-          <AdminPageClient items={items} guestUrl={guestUrl} />
+          <AdminPageClient items={items} guestUrl={guestUrl} adminToken={adminToken} />
         </div>
       </div>
     </>
