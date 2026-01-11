@@ -5,34 +5,12 @@ import { notFound } from "next/navigation";
 import { AdminPageClient } from "@/components/admin-page-client";
 import { AdminPageHeader } from "@/components/admin-page-header";
 import { AppHeader } from "@/components/app-header";
-import { getWishlistByAdminToken } from "@/lib/wishlist";
+import { getWishlistByAdminToken, getItemsForWishlist } from "@/lib/wishlist";
 
 export const metadata: Metadata = {
   title: "Manage Wishlist | Wishlist",
   description: "Manage your wishlist items",
 };
-
-// Mock items data (still using mock for now - will connect later)
-const mockItems = [
-  {
-    id: "1",
-    name: "Wireless Headphones",
-    link: "https://example.com/headphones",
-    price: "$99.99",
-    notes: "Prefer black or silver color",
-    isReserved: false,
-    reservedByToken: null,
-  },
-  {
-    id: "2",
-    name: "Coffee Maker",
-    link: "https://example.com/coffee",
-    price: "$149.99",
-    notes: "",
-    isReserved: true,
-    reservedByToken: "some-reservation-token",
-  },
-];
 
 interface AdminPageProps {
   params: Promise<{
@@ -50,6 +28,19 @@ export default async function AdminPage({ params }: AdminPageProps) {
   if (!wishlist) {
     notFound();
   }
+
+  // Fetch real items from database
+  const dbItems = await getItemsForWishlist(wishlist.id);
+
+  // Transform database items to match component props
+  const items = dbItems.map((item) => ({
+    id: item.id,
+    name: item.name,
+    link: item.link || "",
+    notes: item.notes || "",
+    isReserved: item.is_reserved,
+    reservedByToken: item.reserved_by_token,
+  }));
 
   // Get the origin from headers for the full URL
   const headersList = await headers();
@@ -71,8 +62,8 @@ export default async function AdminPage({ params }: AdminPageProps) {
           shareUrl={guestUrl} 
         />
 
-          {/* Items Section - still using mock data for now */}
-          <AdminPageClient items={mockItems} guestUrl={guestUrl} />
+          {/* Items Section - now using real data from database */}
+          <AdminPageClient items={items} guestUrl={guestUrl} />
         </div>
       </div>
     </>

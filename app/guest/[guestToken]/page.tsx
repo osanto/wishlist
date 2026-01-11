@@ -5,43 +5,12 @@ import { AppHeader } from "@/components/app-header";
 import { EmptyState } from "@/components/empty-state";
 import { GuestItemsList } from "@/components/guest-items-list";
 import { PageHeader } from "@/components/page-header";
-import { getWishlistByGuestToken } from "@/lib/wishlist";
+import { getWishlistByGuestToken, getItemsForWishlist } from "@/lib/wishlist";
 
 export const metadata: Metadata = {
   title: "Wishlist",
   description: "View and reserve wishlist items",
 };
-
-// Mock items for Phase 1 (will be replaced with real items later)
-const mockItems = [
-  {
-    id: "1",
-    name: "Wireless Headphones",
-    link: "https://example.com/headphones",
-    price: "$99.99",
-    notes: "Prefer black or silver color",
-    isReserved: false,
-    reservedByToken: null,
-  },
-  {
-    id: "2",
-    name: "Coffee Maker",
-    link: "https://example.com/coffee",
-    price: "$149.99",
-    notes: "",
-    isReserved: true,
-    reservedByToken: "other-user-token",
-  },
-  {
-    id: "3",
-    name: "Book Set",
-    link: "https://example.com/books",
-    price: "$45.00",
-    notes: "Fantasy series preferred",
-    isReserved: true,
-    reservedByToken: "my-mock-reservation-token", // This simulates user's own reservation
-  },
-];
 
 // Simulate the current user's reservation token (in real app, this comes from localStorage)
 const currentUserReservationToken = "my-mock-reservation-token";
@@ -63,6 +32,19 @@ export default async function GuestPage({ params }: GuestPageProps) {
     notFound();
   }
 
+  // Fetch real items from database
+  const dbItems = await getItemsForWishlist(wishlist.id);
+
+  // Transform database items to match component props
+  const items = dbItems.map((item) => ({
+    id: item.id,
+    name: item.name,
+    link: item.link || "",
+    notes: item.notes || "",
+    isReserved: item.is_reserved,
+    reservedByToken: item.reserved_by_token,
+  }));
+
   return (
     <>
       <AppHeader />
@@ -73,18 +55,18 @@ export default async function GuestPage({ params }: GuestPageProps) {
           description={wishlist.description || undefined}
         />
 
-          {/* Items Section */}
+          {/* Items Section - now using real data from database */}
           <div className="space-y-4">
             <h2 className="text-2xl font-semibold">Items</h2>
 
-            {mockItems.length === 0 ? (
+            {items.length === 0 ? (
               <EmptyState
                 title="No items yet"
                 description="The wishlist owner hasn't added any items yet"
               />
             ) : (
               <GuestItemsList
-                items={mockItems}
+                items={items}
                 currentUserReservationToken={currentUserReservationToken}
               />
             )}

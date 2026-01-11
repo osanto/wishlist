@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { Wishlist } from "@/lib/types";
+import { Wishlist, Item } from "@/lib/types";
 
 /**
  * Fetches a wishlist by admin token.
@@ -41,4 +41,25 @@ export async function getWishlistByGuestToken(
   }
 
   return data;
+}
+
+/**
+ * Fetches all items for a given wishlist.
+ * Returns an array of items or empty array if none found.
+ */
+export async function getItemsForWishlist(
+  wishlistId: string
+): Promise<Item[]> {
+  const { data, error } = await supabase
+    .from("items")
+    .select("*")
+    .eq("wishlist_id", wishlistId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching items:", error);
+    return [];
+  }
+
+  return data || [];
 }
