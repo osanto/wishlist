@@ -1,6 +1,5 @@
-import Link from "next/link";
-
 import { AppHeader } from "@/components/app-header";
+import { createWishlistAction } from "@/app/actions/wishlist";
 
 export default function Home() {
   return (
@@ -16,13 +15,15 @@ export default function Home() {
         </div>
 
         <div className="pt-8">
-          <Link
-            href="/admin/mock-admin-token"
-            data-test-id="create-wishlist-button"
-            className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-8 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-          >
-            Create Wishlist
-          </Link>
+          <form action={createWishlistAction}>
+            <button
+              type="submit"
+              data-test-id="create-wishlist-button"
+              className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-8 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+            >
+              Create Wishlist
+            </button>
+          </form>
         </div>
 
         <div className="pt-8 text-sm text-muted-foreground">
