@@ -40,3 +40,39 @@ export async function createWishlistAction() {
     throw error;
   }
 }
+
+/**
+ * Deletes a wishlist and all associated items.
+ * Validates admin token before deletion.
+ * Items are automatically deleted via CASCADE constraint.
+ */
+export async function deleteWishlistAction(adminToken: string) {
+  try {
+    // Verify wishlist exists and admin token is valid
+    const { data: wishlist, error: selectError } = await supabase
+      .from("wishlist")
+      .select("id")
+      .eq("admin_token", adminToken)
+      .single();
+
+    if (selectError || !wishlist) {
+      throw new Error("Invalid admin token or wishlist not found");
+    }
+
+    // Delete wishlist (items cascade delete automatically)
+    const { error: deleteError } = await supabase
+      .from("wishlist")
+      .delete()
+      .eq("admin_token", adminToken);
+
+    if (deleteError) {
+      console.error("Error deleting wishlist:", deleteError);
+      throw new Error("Failed to delete wishlist");
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error in deleteWishlistAction:", error);
+    throw error;
+  }
+}
