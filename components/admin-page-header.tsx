@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useTransition } from "react";
 
 import { PageHeaderClient } from "@/components/page-header-client";
+import { editWishlistAction } from "@/app/actions/wishlist";
 
 interface AdminPageHeaderProps {
   wishlist: {
@@ -11,24 +12,32 @@ interface AdminPageHeaderProps {
     description?: string;
   };
   shareUrl: string;
+  adminToken: string;
 }
 
 export function AdminPageHeader({
-  wishlist: initialWishlist,
+  wishlist,
   shareUrl,
+  adminToken,
 }: AdminPageHeaderProps) {
-  const [wishlist, setWishlist] = useState(initialWishlist);
+  const [isPending, startTransition] = useTransition();
 
-  const handleEditWishlist = (
+  const handleEditWishlist = async (
     wishlistId: string,
     data: { title: string; description?: string }
   ) => {
-    // TODO: Update wishlist in mock store (Phase 1.3)
-    console.log("Edit wishlist:", wishlistId, data);
-    setWishlist({
-      ...wishlist,
-      title: data.title,
-      description: data.description,
+    startTransition(async () => {
+      const result = await editWishlistAction(adminToken, {
+        title: data.title,
+        description: data.description,
+      });
+
+      if (result.error) {
+        console.error("Error editing wishlist:", result.error);
+        alert(`Error: ${result.error}`);
+      } else {
+        console.log("Wishlist updated successfully");
+      }
     });
   };
 

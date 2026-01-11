@@ -10,6 +10,7 @@ import { GuestPage } from "../pages/GuestPage";
 import { AddItemDialog } from "../pages/AddItemDialog";
 import { EditItemDialog } from "../pages/EditItemDialog";
 import { DeleteItemDialog } from "../pages/DeleteItemDialog";
+import { EditWishlistDialog } from "../pages/EditWishlistDialog";
 import { deleteWishlistAction } from "@/app/actions/wishlist";
 
 type WishlistFixtures = {
@@ -19,6 +20,7 @@ type WishlistFixtures = {
   addItemDialog: AddItemDialog;
   editItemDialog: EditItemDialog;
   deleteItemDialog: DeleteItemDialog;
+  editWishlistDialog: EditWishlistDialog;
   createdWishlists: string[]; // Track admin tokens for cleanup
 };
 
@@ -45,6 +47,10 @@ export const test = base.extend<WishlistFixtures>({
 
   deleteItemDialog: async ({ page }, use) => {
     await use(new DeleteItemDialog(page));
+  },
+
+  editWishlistDialog: async ({ page }, use) => {
+    await use(new EditWishlistDialog(page));
   },
 
   createdWishlists: async ({}, use) => {

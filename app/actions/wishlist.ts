@@ -1,9 +1,11 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 import { supabase } from "@/lib/supabase";
 import { generateAdminToken, generateGuestToken } from "@/lib/tokens";
+import { ActionResponse } from "@/lib/types";
 
 /**
  * Creates a new wishlist with default title and description.
@@ -38,6 +40,63 @@ export async function createWishlistAction() {
   } catch (error) {
     console.error("Error in createWishlistAction:", error);
     throw error;
+  }
+}
+
+interface EditWishlistInput {
+  title: string;
+  description?: string;
+}
+
+/**
+ * Edits a wishlist's title and description.
+ * Validates admin token before updating.
+ */
+export async function editWishlistAction(
+  adminToken: string,
+  data: EditWishlistInput
+): Promise<ActionResponse<void>> {
+  try {
+    // Validate input
+    const trimmedTitle = data.title.trim();
+    if (!trimmedTitle) {
+      return { error: "Title is required" };
+    }
+
+    // Validate admin token and get wishlist ID
+    const { data: wishlist, error: wishlistError } = await supabase
+      .from("wishlist")
+      .select("id")
+      .eq("admin_token", adminToken)
+      .single();
+
+    if (wishlistError || !wishlist) {
+      console.error("Error validating admin token for edit:", wishlistError);
+      return { error: "Invalid admin token" };
+    }
+
+    // Update wishlist
+    const { error: updateError } = await supabase
+      .from("wishlist")
+      .update({
+        title: trimmedTitle,
+        description: data.description?.trim() || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("admin_token", adminToken);
+
+    if (updateError) {
+      console.error("Error updating wishlist:", updateError);
+      return { error: "Failed to update wishlist" };
+    }
+
+    // Revalidate the admin page
+    revalidatePath(`/admin/${adminToken}`);
+
+    return { data: undefined };
+  } catch (error) {
+    console.error("Unexpected error in editWishlistAction:", error);
+    return { error: "An unexpected error occurred." };
   }
 }
 

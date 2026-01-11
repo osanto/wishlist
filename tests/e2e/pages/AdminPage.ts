@@ -43,6 +43,11 @@ export class AdminPage {
     await this.addItemButton.click({ force: true }); // Force click to bypass hydration issues
   }
 
+  async clickEditWishlist() {
+    await this.editWishlistButton.waitFor({ state: "visible", timeout: 10000 });
+    await this.editWishlistButton.click({ force: true });
+  }
+
   async clickEditItemButton() {
     // Click the first edit button (using partial match for dynamic ID)
     const editButton = this.page.locator('[data-test-id^="edit-item-"]').first();
