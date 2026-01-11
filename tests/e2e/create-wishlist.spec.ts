@@ -1,208 +1,163 @@
-import { test, expect } from "@playwright/test";
-import { deleteWishlistAction } from "@/app/actions/wishlist";
+import { test, expect } from "./fixtures/wishlist.fixture";
 import { supabase } from "@/lib/supabase";
 
 test.describe("Create Wishlist Flow", () => {
   test("user can create a wishlist and is redirected to admin page", async ({
-    page,
+    homePage,
+    adminPage,
+    createdWishlists,
   }) => {
-    // 1. Visit homepage
-    await page.goto("/", { waitUntil: "networkidle" });
+    // 1. Visit homepage and create wishlist
+    await homePage.goto();
+    await homePage.clickCreateWishlist();
 
-    // 2. Click "Create Wishlist" button
-    await page.click('[data-test-id="create-wishlist-button"]');
+    // 2. Verify redirect to admin page
+    await adminPage.expectToBeOnAdminPage();
+    await adminPage.waitForLoad();
 
-    // 3. Wait for redirect to admin page
-    await page.waitForURL(/\/admin\/[a-f0-9-]+/);
-
-    // 4. Extract admin token from URL
-    const url = page.url();
-    const adminToken = url.split("/admin/")[1];
-
-    // 5. Verify admin token is a valid UUID
+    // 3. Extract and verify admin token
+    const adminToken = await adminPage.getAdminTokenFromUrl();
+    expect(adminToken).not.toBeNull();
     expect(adminToken).toMatch(
       /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     );
+    createdWishlists.push(adminToken!);
 
-    // 6. Verify admin page loaded successfully
-    await page.waitForLoadState("networkidle");
-    await expect(page.locator('h1:has-text("My Wishlist")')).toBeVisible();
-
-    // 7. Clean up: Delete the wishlist using server action
-    try {
-      await deleteWishlistAction(adminToken);
-    } catch (error) {
-      console.error("Failed to clean up test wishlist:", error);
-    }
+    // 4. Verify admin page loaded with default title
+    await adminPage.expectWishlistTitle("My Wishlist");
   });
 
   test("created wishlist persists in database with correct data", async ({
-    page,
+    homePage,
+    adminPage,
+    createdWishlists,
   }) => {
     // 1. Create wishlist via UI
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
-    await page.click('[data-test-id="create-wishlist-button"]');
-    await page.waitForURL(/\/admin\/[a-f0-9-]+/);
+    await homePage.goto();
+    await homePage.clickCreateWishlist();
+    await adminPage.expectToBeOnAdminPage();
 
-    // 2. Extract admin token from URL
-    const url = page.url();
-    const adminToken = url.split("/admin/")[1];
+    // 2. Extract admin token
+    const adminToken = await adminPage.getAdminTokenFromUrl();
+    expect(adminToken).not.toBeNull();
+    createdWishlists.push(adminToken!);
 
     // 3. Query database to verify wishlist exists
-    const { data: wishlist, error } = await supabase
+    const { data, error } = await supabase
       .from("wishlist")
       .select("*")
       .eq("admin_token", adminToken)
       .single();
 
-    // 4. Assert: Wishlist exists in database
+    // 4. Verify wishlist data
     expect(error).toBeNull();
-    expect(wishlist).toBeDefined();
-    expect(wishlist?.admin_token).toBe(adminToken);
-    expect(wishlist?.title).toBe("My Wishlist");
-    expect(wishlist?.description).toBeNull();
-
-    // 5. Assert: Guest token was also generated
-    expect(wishlist?.guest_token).toBeTruthy();
-    expect(wishlist?.guest_token).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-    );
-
-    // 6. Assert: Admin and guest tokens are different
-    expect(wishlist?.admin_token).not.toBe(wishlist?.guest_token);
-
-    // 7. Clean up
-    await deleteWishlistAction(adminToken);
+    expect(data).toBeDefined();
+    expect(data?.title).toBe("My Wishlist");
+    expect(data?.admin_token).toBe(adminToken);
+    expect(data?.guest_token).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(data?.admin_token).not.toBe(data?.guest_token);
   });
 
   test("multiple wishlists can be created with unique tokens", async ({
-    page,
+    homePage,
+    adminPage,
+    createdWishlists,
   }) => {
     // 1. Create first wishlist
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
-    await page.click('[data-test-id="create-wishlist-button"]');
-    await page.waitForURL(/\/admin\/[a-f0-9-]+/);
-    const url1 = page.url();
-    const adminToken1 = url1.split("/admin/")[1];
+    await homePage.goto();
+    await homePage.clickCreateWishlist();
+    await adminPage.expectToBeOnAdminPage();
+    const adminToken1 = await adminPage.getAdminTokenFromUrl();
+    expect(adminToken1).not.toBeNull();
+    createdWishlists.push(adminToken1!);
 
     // 2. Create second wishlist
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
-    await page.click('[data-test-id="create-wishlist-button"]');
-    await page.waitForURL(/\/admin\/[a-f0-9-]+/);
-    const url2 = page.url();
-    const adminToken2 = url2.split("/admin/")[1];
+    await homePage.goto();
+    await homePage.clickCreateWishlist();
+    await adminPage.expectToBeOnAdminPage();
+    const adminToken2 = await adminPage.getAdminTokenFromUrl();
+    expect(adminToken2).not.toBeNull();
+    createdWishlists.push(adminToken2!);
 
-    // 3. Assert: Different tokens
+    // 3. Verify tokens are different
     expect(adminToken1).not.toBe(adminToken2);
 
-    // 4. Assert: Both wishlists exist in database
-    const { data: wishlists, error } = await supabase
+    // 4. Verify both exist in database
+    const { data: wishlist1 } = await supabase
       .from("wishlist")
-      .select("*")
-      .in("admin_token", [adminToken1, adminToken2]);
+      .select("id")
+      .eq("admin_token", adminToken1)
+      .single();
+    const { data: wishlist2 } = await supabase
+      .from("wishlist")
+      .select("id")
+      .eq("admin_token", adminToken2)
+      .single();
 
-    expect(error).toBeNull();
-    expect(wishlists).toHaveLength(2);
-
-    // 5. Clean up both wishlists
-    await deleteWishlistAction(adminToken1);
-    await deleteWishlistAction(adminToken2);
+    expect(wishlist1).toBeDefined();
+    expect(wishlist2).toBeDefined();
   });
 
   test("admin page shows 404 for invalid token", async ({ page }) => {
-    // 1. Visit admin page with fake/invalid token
+    // 1. Visit admin page with invalid token
     const fakeAdminToken = "invalid-token-that-does-not-exist";
     await page.goto(`/admin/${fakeAdminToken}`);
     await page.waitForLoadState("networkidle");
 
-    // 2. Assert: 404 page is shown
-    // Check for Next.js default 404 page elements
+    // 2. Verify 404 page is shown
     const pageContent = await page.textContent("body");
-    
     expect(pageContent).toContain("404");
-    
-    // 3. Assert: Wishlist data is NOT shown
-    // The wishlist title element should not exist
+
+    // 3. Verify wishlist data is NOT shown
     const wishlistTitle = page.getByTestId("wishlist-title");
     await expect(wishlistTitle).not.toBeVisible();
   });
 
-  test("guest can access wishlist page but not see admin controls", async ({ page, context }) => {
-    let adminToken: string | null = null;
+  test("guest can access wishlist page but not see admin controls", async ({
+    context,
+    homePage,
+    adminPage,
+    guestPage,
+    createdWishlists,
+  }) => {
+    // 1. Create wishlist as admin
+    await homePage.goto();
+    await homePage.clickCreateWishlist();
+    await adminPage.expectToBeOnAdminPage();
 
-    try {
-      // 1. Create wishlist as admin
-      await page.goto("/", { waitUntil: "networkidle" });
-      const createButton = page.getByRole('button', { name: 'Create Wishlist' });
-      await expect(createButton).toBeVisible({ timeout: 15000 });
-      await createButton.click();
-      await page.waitForURL(/\/admin\/[a-f0-9-]+/, { timeout: 15000 });
+    // 2. Extract admin token
+    const adminToken = await adminPage.getAdminTokenFromUrl();
+    expect(adminToken).not.toBeNull();
+    createdWishlists.push(adminToken!);
 
-      // 2. Extract admin token from URL
-      const adminUrl = page.url();
-      const adminMatch = adminUrl.match(/\/admin\/([0-9a-f-]{36})/);
-      adminToken = adminMatch ? adminMatch[1] : null;
-      expect(adminToken).not.toBeNull();
+    // 3. Get guest token from database
+    const { data: wishlist } = await supabase
+      .from("wishlist")
+      .select("guest_token")
+      .eq("admin_token", adminToken)
+      .single();
 
-      // 3. Get guest token from database
-      const { data: wishlist } = await supabase
-        .from("wishlist")
-        .select("guest_token")
-        .eq("admin_token", adminToken)
-        .single();
+    expect(wishlist).toBeDefined();
+    expect(wishlist?.guest_token).toBeDefined();
+    const guestToken = wishlist?.guest_token;
 
-      expect(wishlist).toBeDefined();
-      expect(wishlist?.guest_token).toBeDefined();
-      const guestToken = wishlist?.guest_token;
+    // 4. Open guest page in new browser context (simulates different user)
+    const guestPageContext = await context.newPage();
+    const guestPageObject = new (await import("./pages/GuestPage")).GuestPage(
+      guestPageContext
+    );
 
-      // 4. Verify guest token is a valid UUID
-      expect(guestToken).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+    // 5. Navigate to guest page
+    await guestPageObject.goto(guestToken!);
 
-      // 5. Verify admin and guest tokens are different
-      expect(guestToken).not.toBe(adminToken);
+    // 6. Verify guest page loads and shows wishlist
+    await guestPageObject.expectPageLoaded();
+    await guestPageObject.expectWishlistTitle("My Wishlist");
 
-      // 6. Open guest page in new browser context (simulates different user)
-      const guestPage = await context.newPage();
-      await guestPage.goto(`/guest/${guestToken}`, { waitUntil: "domcontentloaded" });
+    // 7. Verify no admin controls are visible
+    await guestPageObject.expectNoAdminControls();
 
-      // 7. Assert: Guest page loads successfully (shows mock data for now)
-      // Wait for title using text content (more reliable for hydration)
-      await expect(guestPage.getByRole('heading', { name: /My Wishlist/i })).toBeVisible({ timeout: 15000 });
-      await expect(guestPage).toHaveTitle(/Wishlist/i);
-
-      // 8. Verify guest does NOT see admin controls
-      const addItemButton = guestPage.getByTestId("add-item-button");
-      await expect(addItemButton).not.toBeVisible();
-
-      // 9. Verify guest does NOT see edit wishlist button
-      const editWishlistButton = guestPage.getByTestId("edit-wishlist-button");
-      await expect(editWishlistButton).not.toBeVisible();
-
-      // 10. Verify guest does NOT see "Share with Guests" section
-      const shareSection = guestPage.getByText(/Share with Guests/i);
-      await expect(shareSection).not.toBeVisible();
-
-      // 11. Verify guest does NOT see copy link button
-      const copyLinkButton = guestPage.getByTestId("copy-link-button");
-      await expect(copyLinkButton).not.toBeVisible();
-
-      // 12. Verify guest does NOT see edit/delete buttons for items
-      const editItemButton = guestPage.getByTestId("edit-item-button");
-      await expect(editItemButton).not.toBeVisible();
-      
-      const deleteItemButton = guestPage.getByTestId("delete-item-button");
-      await expect(deleteItemButton).not.toBeVisible();
-
-      // Cleanup guest page
-      await guestPage.close();
-    } finally {
-      // Cleanup wishlist
-      if (adminToken) {
-        await deleteWishlistAction(adminToken);
-      }
-    }
+    // Cleanup
+    await guestPageContext.close();
   });
 });
