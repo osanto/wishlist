@@ -50,8 +50,21 @@ export class AdminPage {
     await editButton.click({ force: true });
   }
 
+  async clickDeleteItemButton() {
+    // Click the first delete button (using partial match for dynamic ID)
+    const deleteButton = this.page.locator('[data-test-id^="delete-item-"]').first();
+    await deleteButton.waitFor({ state: "visible", timeout: 10000 });
+    await deleteButton.click({ force: true });
+  }
+
   async expectItemVisible(itemName: string) {
     await expect(this.page.getByText(itemName)).toBeVisible({
+      timeout: 10000,
+    });
+  }
+
+  async expectItemNotVisible(itemName: string) {
+    await expect(this.page.getByText(itemName)).not.toBeVisible({
       timeout: 10000,
     });
   }

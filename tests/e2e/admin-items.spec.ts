@@ -89,4 +89,64 @@ test.describe("Admin Item Management", () => {
     expect(pageContent).not.toContain("https://example.com/original");
     expect(pageContent).not.toContain("Original notes");
   });
+
+  test("admin can delete an item", async ({
+    context,
+    homePage,
+    adminPage,
+    addItemDialog,
+    deleteItemDialog,
+    createdWishlists,
+  }) => {
+    // 1. Create wishlist and add an item
+    await homePage.goto();
+    await homePage.clickCreateWishlist();
+    await adminPage.expectToBeOnAdminPage();
+    const adminToken = await adminPage.getAdminTokenFromUrl();
+    expect(adminToken).not.toBeNull();
+    createdWishlists.push(adminToken!);
+    await adminPage.waitForLoad();
+
+    // 2. Get guest token from database
+    const { data: wishlist } = await supabase
+      .from("wishlist")
+      .select("guest_token")
+      .eq("admin_token", adminToken)
+      .single();
+    const guestToken = wishlist?.guest_token;
+    expect(guestToken).not.toBeNull();
+
+    // 3. Add an item
+    await adminPage.clickAddItem();
+    await addItemDialog.fillForm({
+      name: "Item to Delete",
+      link: "https://example.com/delete",
+      notes: "This will be deleted",
+    });
+    await addItemDialog.submitAndWaitForClose();
+    await adminPage.expectItemVisible("Item to Delete");
+
+    // 4. Open guest page in a new tab to verify item is visible
+    const guestPage = await context.newPage();
+    await guestPage.goto(`http://localhost:3000/guest/${guestToken}`);
+    await guestPage.waitForLoadState("networkidle");
+    await expect(guestPage.getByText("Item to Delete")).toBeVisible();
+
+    // 5. Back to admin page - click delete button on the item
+    await adminPage.clickDeleteItemButton();
+
+    // 6. Confirm deletion in the dialog
+    await deleteItemDialog.confirmAndWaitForClose();
+
+    // 7. Verify item is no longer visible in admin view
+    await adminPage.expectItemNotVisible("Item to Delete");
+
+    // 8. Verify item is also no longer visible in guest view
+    await guestPage.reload();
+    await guestPage.waitForLoadState("networkidle");
+    await expect(guestPage.getByText("Item to Delete")).not.toBeVisible();
+
+    // Cleanup
+    await guestPage.close();
+  });
 });
