@@ -200,3 +200,146 @@ export async function deleteItemAction(
     return { error: "An unexpected error occurred." };
   }
 }
+
+/**
+ * Reserves an item for a guest.
+ * Validates guest token and checks if item is available before reserving.
+ */
+export async function reserveItemAction(
+  guestToken: string,
+  itemId: string,
+  reservationToken: string
+): Promise<ActionResponse<Item>> {
+  try {
+    // Validate guest token and get wishlist ID
+    const { data: wishlist, error: wishlistError } = await supabase
+      .from("wishlist")
+      .select("id")
+      .eq("guest_token", guestToken)
+      .single();
+
+    if (wishlistError || !wishlist) {
+      console.error("Error validating guest token:", wishlistError);
+      return { error: "Invalid guest token" };
+    }
+
+    // Check if item exists and belongs to this wishlist
+    const { data: existingItem, error: itemError } = await supabase
+      .from("items")
+      .select("id, wishlist_id, is_reserved, reserved_by_token")
+      .eq("id", itemId)
+      .single();
+
+    if (itemError || !existingItem) {
+      console.error("Error fetching item:", itemError);
+      return { error: "Item not found" };
+    }
+
+    if (existingItem.wishlist_id !== wishlist.id) {
+      return { error: "Item does not belong to this wishlist" };
+    }
+
+    // Check if item is already reserved
+    if (existingItem.is_reserved) {
+      return { error: "Item is already reserved" };
+    }
+
+    // Reserve the item
+    const { data: reservedItem, error: updateError } = await supabase
+      .from("items")
+      .update({
+        is_reserved: true,
+        reserved_by_token: reservationToken,
+      })
+      .eq("id", itemId)
+      .select()
+      .single();
+
+    if (updateError || !reservedItem) {
+      console.error("Error reserving item:", updateError);
+      return { error: "Failed to reserve item" };
+    }
+
+    // Revalidate the guest page to show the reservation
+    revalidatePath(`/guest/${guestToken}`);
+
+    return { data: reservedItem };
+  } catch (error) {
+    console.error("Error in reserveItemAction:", error);
+    return { error: "Failed to reserve item" };
+  }
+}
+
+/**
+ * Cancels a reservation for an item.
+ * Validates guest token and checks if the user owns the reservation before canceling.
+ */
+export async function cancelReservationAction(
+  guestToken: string,
+  itemId: string,
+  reservationToken: string
+): Promise<ActionResponse<Item>> {
+  try {
+    // Validate guest token and get wishlist ID
+    const { data: wishlist, error: wishlistError } = await supabase
+      .from("wishlist")
+      .select("id")
+      .eq("guest_token", guestToken)
+      .single();
+
+    if (wishlistError || !wishlist) {
+      console.error("Error validating guest token:", wishlistError);
+      return { error: "Invalid guest token" };
+    }
+
+    // Check if item exists and belongs to this wishlist
+    const { data: existingItem, error: itemError } = await supabase
+      .from("items")
+      .select("id, wishlist_id, is_reserved, reserved_by_token")
+      .eq("id", itemId)
+      .single();
+
+    if (itemError || !existingItem) {
+      console.error("Error fetching item:", itemError);
+      return { error: "Item not found" };
+    }
+
+    if (existingItem.wishlist_id !== wishlist.id) {
+      return { error: "Item does not belong to this wishlist" };
+    }
+
+    // Check if item is reserved
+    if (!existingItem.is_reserved) {
+      return { error: "Item is not reserved" };
+    }
+
+    // Check if the reservation belongs to this user
+    if (existingItem.reserved_by_token !== reservationToken) {
+      return { error: "You can only cancel your own reservations" };
+    }
+
+    // Cancel the reservation
+    const { data: unreservedItem, error: updateError } = await supabase
+      .from("items")
+      .update({
+        is_reserved: false,
+        reserved_by_token: null,
+      })
+      .eq("id", itemId)
+      .select()
+      .single();
+
+    if (updateError || !unreservedItem) {
+      console.error("Error canceling reservation:", updateError);
+      return { error: "Failed to cancel reservation" };
+    }
+
+    // Revalidate the guest page to show the cancellation
+    revalidatePath(`/guest/${guestToken}`);
+
+    return { data: unreservedItem };
+  } catch (error) {
+    console.error("Error in cancelReservationAction:", error);
+    return { error: "Failed to cancel reservation" };
+  }
+}
