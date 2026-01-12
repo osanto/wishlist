@@ -3,17 +3,15 @@ import { notFound } from "next/navigation";
 
 import { AppHeader } from "@/components/app-header";
 import { EmptyState } from "@/components/empty-state";
-import { GuestItemsList } from "@/components/guest-items-list";
+import { GuestPageClient } from "@/components/guest-page-client";
 import { PageHeader } from "@/components/page-header";
+import { TokenHandler } from "@/components/token-handler";
 import { getWishlistByGuestToken, getItemsForWishlist } from "@/lib/wishlist";
 
 export const metadata: Metadata = {
   title: "Wishlist",
   description: "View and reserve wishlist items",
 };
-
-// Simulate the current user's reservation token (in real app, this comes from localStorage)
-const currentUserReservationToken = "my-mock-reservation-token";
 
 interface GuestPageProps {
   params: Promise<{
@@ -47,6 +45,7 @@ export default async function GuestPage({ params }: GuestPageProps) {
 
   return (
     <>
+      <TokenHandler token={guestToken} type="guest" />
       <AppHeader />
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-4xl p-6 space-y-8">
@@ -65,10 +64,7 @@ export default async function GuestPage({ params }: GuestPageProps) {
                 description="The wishlist owner hasn't added any items yet"
               />
             ) : (
-              <GuestItemsList
-                items={items}
-                currentUserReservationToken={currentUserReservationToken}
-              />
+              <GuestPageClient items={items} />
             )}
           </div>
         </div>
