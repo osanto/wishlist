@@ -343,3 +343,45 @@ export async function cancelReservationAction(
     return { error: "Failed to cancel reservation" };
   }
 }
+
+/**
+ * Admin action to unreserve any item (override guest reservation).
+ * Validates admin token before unreserving.
+ */
+export async function unreserveItemAction(
+  adminToken: string,
+  itemId: string
+): Promise<ActionResponse<{ success: boolean }>> {
+  try {
+    // Validate admin token
+    const { getWishlistByAdminToken } = await import("@/lib/wishlist");
+    const wishlist = await getWishlistByAdminToken(adminToken);
+
+    if (!wishlist) {
+      return { error: "Invalid admin token" };
+    }
+
+    // Unreserve the item (no checks - admin can override any reservation)
+    const { data, error } = await supabase
+      .from("items")
+      .update({
+        is_reserved: false,
+        reserved_by_token: null,
+      })
+      .eq("id", itemId);
+
+    if (error) {
+      console.error("Error unreserving item:", error);
+      return { error: "Failed to unreserve item" };
+    }
+
+    // Revalidate both admin and guest pages
+    revalidatePath(`/admin/${adminToken}`);
+    revalidatePath(`/guest/${wishlist.guest_token}`);
+
+    return { data: { success: true } };
+  } catch (error) {
+    console.error("Error in unreserveItemAction:", error);
+    return { error: "Failed to unreserve item" };
+  }
+}
