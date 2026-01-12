@@ -165,7 +165,6 @@ test.describe("Create Wishlist Flow", () => {
     context,
     homePage,
     adminPage,
-    editWishlistDialog,
     createdWishlists,
   }) => {
     // 1. Create wishlist
@@ -193,14 +192,14 @@ test.describe("Create Wishlist Flow", () => {
 
     // 5. Open edit wishlist dialog
     await adminPage.clickEditWishlist();
-    await editWishlistDialog.expectDialogOpen();
+    await adminPage.editWishlistDialog.expectDialogOpen();
 
     // 6. Edit title and description
-    await editWishlistDialog.fillForm({
+    await adminPage.editWishlistDialog.fillForm({
       title: "Birthday Wishlist 2026",
       description: "Things I'd love for my birthday!",
     });
-    await editWishlistDialog.submitAndWaitForClose();
+    await adminPage.editWishlistDialog.submitAndWaitForClose();
 
     // 7. Verify updated title appears in admin view
     await adminPage.expectWishlistTitle("Birthday Wishlist 2026");
