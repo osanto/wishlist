@@ -6,7 +6,6 @@ test.describe("Admin Item Management", () => {
     context,
     homePage,
     adminPage,
-    addItemDialog,
     createdWishlists,
   }) => {
     // 1. Create wishlist
@@ -35,12 +34,12 @@ test.describe("Admin Item Management", () => {
     await adminPage.clickAddItem();
 
     // 6. Fill in item details and submit
-    await addItemDialog.fillForm({
+    await adminPage.addItemDialog.fillForm({
       name: "Wireless Headphones",
       link: "https://example.com/headphones",
       notes: "Black or silver preferred",
     });
-    await addItemDialog.submitAndWaitForClose();
+    await adminPage.addItemDialog.submitAndWaitForClose();
 
     // 7. Verify item appears in admin view
     await adminPage.expectItemVisible("Wireless Headphones");
@@ -60,8 +59,6 @@ test.describe("Admin Item Management", () => {
     context,
     homePage,
     adminPage,
-    addItemDialog,
-    editItemDialog,
     createdWishlists,
   }) => {
     // 1. Create wishlist and add an item
@@ -84,24 +81,24 @@ test.describe("Admin Item Management", () => {
 
     // 3. Add initial item
     await adminPage.clickAddItem();
-    await addItemDialog.fillForm({
+    await adminPage.addItemDialog.fillForm({
       name: "Original Item",
       link: "https://example.com/original",
       notes: "Original notes",
     });
-    await addItemDialog.submitAndWaitForClose();
+    await adminPage.addItemDialog.submitAndWaitForClose();
     await adminPage.expectItemVisible("Original Item");
 
     // 4. Click edit button on the item
     await adminPage.clickEditItemButton();
 
     // 5. Update the item in the edit dialog
-    await editItemDialog.fillForm({
+    await adminPage.editItemDialog.fillForm({
       name: "Updated Item",
       link: "https://example.com/updated",
       notes: "Updated notes",
     });
-    await editItemDialog.submitAndWaitForClose();
+    await adminPage.editItemDialog.submitAndWaitForClose();
 
     // 6. Verify updated item appears in admin view
     await adminPage.expectItemVisible("Updated Item");
@@ -142,8 +139,6 @@ test.describe("Admin Item Management", () => {
     context,
     homePage,
     adminPage,
-    addItemDialog,
-    deleteItemDialog,
     createdWishlists,
   }) => {
     // 1. Create wishlist and add an item
@@ -166,12 +161,12 @@ test.describe("Admin Item Management", () => {
 
     // 3. Add an item
     await adminPage.clickAddItem();
-    await addItemDialog.fillForm({
+    await adminPage.addItemDialog.fillForm({
       name: "Item to Delete",
       link: "https://example.com/delete",
       notes: "This will be deleted",
     });
-    await addItemDialog.submitAndWaitForClose();
+    await adminPage.addItemDialog.submitAndWaitForClose();
     await adminPage.expectItemVisible("Item to Delete");
 
     // 4. Open guest page in a new tab to verify item is visible
@@ -184,7 +179,7 @@ test.describe("Admin Item Management", () => {
     await adminPage.clickDeleteItemButton();
 
     // 6. Confirm deletion in the dialog
-    await deleteItemDialog.confirmAndWaitForClose();
+    await adminPage.deleteItemDialog.confirmAndWaitForClose();
 
     // 7. Verify item is no longer visible in admin view
     await adminPage.expectItemNotVisible("Item to Delete");

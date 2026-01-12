@@ -1,4 +1,8 @@
 import { Page, expect, Locator } from "@playwright/test";
+import { AddItemDialog } from "./AddItemDialog";
+import { EditItemDialog } from "./EditItemDialog";
+import { DeleteItemDialog } from "./DeleteItemDialog";
+import { EditWishlistDialog } from "./EditWishlistDialog";
 
 export class AdminPage {
   private readonly addItemButton: Locator;
@@ -7,12 +11,24 @@ export class AdminPage {
   private readonly copyLinkButton: Locator;
   private readonly emptyState: Locator;
 
+  // Dialog instances (composition)
+  public readonly addItemDialog: AddItemDialog;
+  public readonly editItemDialog: EditItemDialog;
+  public readonly deleteItemDialog: DeleteItemDialog;
+  public readonly editWishlistDialog: EditWishlistDialog;
+
   constructor(private page: Page) {
     this.addItemButton = page.locator('[data-test-id="add-item-button"]');
     this.wishlistTitle = page.locator('[data-test-id="wishlist-title"]');
     this.editWishlistButton = page.locator('[data-test-id="edit-wishlist-button"]');
     this.copyLinkButton = page.locator('[data-test-id="copy-link-button"]');
     this.emptyState = page.locator('[data-test-id="empty-state"]');
+
+    // Initialize dialogs
+    this.addItemDialog = new AddItemDialog(page);
+    this.editItemDialog = new EditItemDialog(page);
+    this.deleteItemDialog = new DeleteItemDialog(page);
+    this.editWishlistDialog = new EditWishlistDialog(page);
   }
 
   async goto(adminToken: string) {
