@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { toast } from "sonner";
 
 import { Link2Icon } from "@radix-ui/react-icons";
 
@@ -11,15 +11,12 @@ interface ShareLinkSectionProps {
 }
 
 export function ShareLinkSection({ guestUrl }: ShareLinkSectionProps) {
-  const [copied, setCopied] = useState(false);
-
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(guestUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      toast.success("Link copied to clipboard!");
     } catch (err) {
-      console.error("Failed to copy:", err);
+      toast.error("Failed to copy link");
     }
   };
 
@@ -27,10 +24,9 @@ export function ShareLinkSection({ guestUrl }: ShareLinkSectionProps) {
     <Button
       onClick={handleCopy}
       data-test-id="copy-link-button"
-      variant={copied ? "outline" : "default"}
     >
       <Link2Icon />
-      {copied ? "Copied!" : "Copy Link"}
+      Copy Link
     </Button>
   );
 }

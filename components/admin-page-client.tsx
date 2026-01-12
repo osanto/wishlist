@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 
 import { AddItemDialog } from "@/components/add-item-dialog";
 import { AdminItemsList } from "@/components/admin-items-list";
@@ -43,12 +44,10 @@ export function AdminPageClient({
       });
 
       if (result.error) {
-        // TODO: Show error toast
-        console.error("Error adding item:", result.error);
-        alert(`Error: ${result.error}`);
+        toast.error(result.error);
       } else {
-        // Success - page will automatically refresh due to revalidatePath
-        console.log("Item added successfully:", result.data);
+        setIsDialogOpen(false);
+        toast.success("Item added!");
       }
     });
   };

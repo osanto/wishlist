@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 
 import { DeleteItemDialog } from "@/components/delete-item-dialog";
 import { EditItemDialog } from "@/components/edit-item-dialog";
@@ -50,13 +51,10 @@ export function AdminItemsList({ items, adminToken }: AdminItemsListProps) {
       });
 
       if (result.error) {
-        // TODO: Show error toast
-        console.error("Error editing item:", result.error);
-        alert(`Error: ${result.error}`);
+        toast.error(result.error);
       } else {
-        // Success - page will automatically refresh due to revalidatePath
-        console.log("Item updated successfully:", result.data);
         setIsEditDialogOpen(false);
+        toast.success("Item updated!");
       }
     });
   };
@@ -71,11 +69,10 @@ export function AdminItemsList({ items, adminToken }: AdminItemsListProps) {
       const result = await deleteItemAction(adminToken, itemId);
 
       if (result.error) {
-        console.error("Error deleting item:", result.error);
-        alert(`Error: ${result.error}`);
+        toast.error(result.error);
       } else {
-        console.log("Item deleted successfully");
         setIsDeleteDialogOpen(false);
+        toast.success("Item deleted!");
       }
     });
   };

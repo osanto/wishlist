@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { toast } from "sonner";
 
 import { PageHeaderClient } from "@/components/page-header-client";
 import { editWishlistAction } from "@/app/actions/wishlist";
@@ -33,10 +34,9 @@ export function AdminPageHeader({
       });
 
       if (result.error) {
-        console.error("Error editing wishlist:", result.error);
-        alert(`Error: ${result.error}`);
+        toast.error(result.error);
       } else {
-        console.log("Wishlist updated successfully");
+        toast.success("Wishlist updated!");
       }
     });
   };

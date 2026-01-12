@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 
 import { CancelReservationDialog } from "@/components/cancel-reservation-dialog";
 import { ItemCard } from "@/components/item-card";
@@ -47,11 +48,10 @@ export function GuestItemsList({
       );
 
       if (result.error) {
-        console.error("Failed to reserve item:", result.error);
-        // TODO: Show error toast (Phase 4.4)
+        toast.error(result.error);
       } else {
         setIsReserveModalOpen(false);
-        // TODO: Show success toast (Phase 4.4)
+        toast.success("Item reserved!");
       }
     });
   };
@@ -70,11 +70,10 @@ export function GuestItemsList({
       );
 
       if (result.error) {
-        console.error("Failed to cancel reservation:", result.error);
-        // TODO: Show error toast (Phase 4.4)
+        toast.error(result.error);
       } else {
         setIsCancelDialogOpen(false);
-        // TODO: Show success toast (Phase 4.4)
+        toast.success("Reservation cancelled!");
       }
     });
   };
