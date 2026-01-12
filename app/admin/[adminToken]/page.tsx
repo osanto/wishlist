@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { AdminPageClient } from "@/components/admin-page-client";
 import { AdminPageHeader } from "@/components/admin-page-header";
 import { AppHeader } from "@/components/app-header";
+import { TokenHandler } from "@/components/token-handler";
 import { getWishlistByAdminToken, getItemsForWishlist } from "@/lib/wishlist";
 
 export const metadata: Metadata = {
@@ -50,6 +51,7 @@ export default async function AdminPage({ params }: AdminPageProps) {
 
   return (
     <>
+      <TokenHandler token={adminToken} type="admin" />
       <AppHeader />
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-4xl p-6 space-y-8">
