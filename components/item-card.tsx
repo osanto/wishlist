@@ -35,7 +35,7 @@ export function ItemCard({
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-semibold">{item.name}</h3>
             {variant === "admin" && item.isReserved && (
-              <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium">
+              <span className="inline-flex items-center rounded-full bg-blue-500/20 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-400 border border-blue-500/30">
                 Reserved
               </span>
             )}
@@ -51,7 +51,7 @@ export function ItemCard({
               reservationStatus === "reserved-by-other" && (
                 <span
                   data-test-id={`reserved-badge-${item.id}`}
-                  className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium"
+                  className="inline-flex items-center rounded-full bg-blue-500/20 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-400 border border-blue-500/30"
                 >
                   Reserved
                 </span>
