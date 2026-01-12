@@ -64,7 +64,7 @@ export default async function GuestPage({ params }: GuestPageProps) {
                 description="The wishlist owner hasn't added any items yet"
               />
             ) : (
-              <GuestPageClient items={items} />
+              <GuestPageClient guestToken={guestToken} items={items} />
             )}
           </div>
         </div>

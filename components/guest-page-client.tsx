@@ -5,6 +5,7 @@ import { GuestItemsList } from "@/components/guest-items-list";
 import { getOrCreateReservationToken } from "@/lib/token-storage";
 
 interface GuestPageClientProps {
+  guestToken: string;
   items: Array<{
     id: string;
     name: string;
@@ -19,7 +20,7 @@ interface GuestPageClientProps {
  * Client component that handles reservation token generation
  * and passes it to the items list
  */
-export function GuestPageClient({ items }: GuestPageClientProps) {
+export function GuestPageClient({ guestToken, items }: GuestPageClientProps) {
   const [reservationToken, setReservationToken] = useState<string>("");
 
   useEffect(() => {
@@ -32,6 +33,7 @@ export function GuestPageClient({ items }: GuestPageClientProps) {
   if (!reservationToken) {
     return (
       <GuestItemsList
+        guestToken={guestToken}
         items={items}
         currentUserReservationToken=""
       />
@@ -40,6 +42,7 @@ export function GuestPageClient({ items }: GuestPageClientProps) {
 
   return (
     <GuestItemsList
+      guestToken={guestToken}
       items={items}
       currentUserReservationToken={reservationToken}
     />

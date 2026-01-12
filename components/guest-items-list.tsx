@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 import { CancelReservationDialog } from "@/components/cancel-reservation-dialog";
 import { ItemCard } from "@/components/item-card";
 import { ReserveItemModal } from "@/components/reserve-item-modal";
+import { reserveItemAction, cancelReservationAction } from "@/app/actions/items";
 
 interface Item {
   id: string;
@@ -16,11 +17,13 @@ interface Item {
 }
 
 interface GuestItemsListProps {
+  guestToken: string;
   items: Item[];
   currentUserReservationToken: string;
 }
 
 export function GuestItemsList({
+  guestToken,
   items,
   currentUserReservationToken,
 }: GuestItemsListProps) {
@@ -28,15 +31,29 @@ export function GuestItemsList({
   const [isReserveModalOpen, setIsReserveModalOpen] = useState(false);
   const [cancellingItem, setCancellingItem] = useState<Item | null>(null);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const handleReserve = (item: Item) => {
     setReservingItem(item);
     setIsReserveModalOpen(true);
   };
 
-  const handleReserveConfirm = (itemId: string) => {
-    // TODO: Reserve item in mock store (Phase 1.3)
-    console.log("Reserve item:", itemId);
+  const handleReserveConfirm = async (itemId: string) => {
+    startTransition(async () => {
+      const result = await reserveItemAction(
+        guestToken,
+        itemId,
+        currentUserReservationToken
+      );
+
+      if (result.error) {
+        console.error("Failed to reserve item:", result.error);
+        // TODO: Show error toast (Phase 4.4)
+      } else {
+        setIsReserveModalOpen(false);
+        // TODO: Show success toast (Phase 4.4)
+      }
+    });
   };
 
   const handleCancelReservation = (item: Item) => {
@@ -44,9 +61,22 @@ export function GuestItemsList({
     setIsCancelDialogOpen(true);
   };
 
-  const handleCancelReservationConfirm = (itemId: string) => {
-    // TODO: Cancel reservation in mock store (Phase 1.3)
-    console.log("Cancel reservation:", itemId);
+  const handleCancelReservationConfirm = async (itemId: string) => {
+    startTransition(async () => {
+      const result = await cancelReservationAction(
+        guestToken,
+        itemId,
+        currentUserReservationToken
+      );
+
+      if (result.error) {
+        console.error("Failed to cancel reservation:", result.error);
+        // TODO: Show error toast (Phase 4.4)
+      } else {
+        setIsCancelDialogOpen(false);
+        // TODO: Show success toast (Phase 4.4)
+      }
+    });
   };
 
   return (

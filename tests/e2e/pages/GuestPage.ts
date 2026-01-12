@@ -8,8 +8,10 @@ export class GuestPage {
   private readonly copyLinkButton: Locator;
   private readonly editItemButton: Locator;
   private readonly deleteItemButton: Locator;
+  private readonly reserveConfirmButton: Locator;
+  private readonly cancelReservationConfirmButton: Locator;
 
-  constructor(private page: Page) {
+  constructor(public page: Page) {
     this.wishlistTitle = page.locator('[data-test-id="wishlist-title"]');
     this.addItemButton = page.locator('[data-test-id="add-item-button"]');
     this.editWishlistButton = page.locator('[data-test-id="edit-wishlist-button"]');
@@ -17,6 +19,8 @@ export class GuestPage {
     this.copyLinkButton = page.locator('[data-test-id="copy-link-button"]');
     this.editItemButton = page.locator('[data-test-id="edit-item-button"]');
     this.deleteItemButton = page.locator('[data-test-id="delete-item-button"]');
+    this.reserveConfirmButton = page.locator('[data-test-id="reserve-item-confirm-button"]');
+    this.cancelReservationConfirmButton = page.locator('[data-test-id="cancel-reservation-confirm-button"]');
   }
 
   async goto(guestToken: string) {
@@ -43,5 +47,40 @@ export class GuestPage {
 
   async expectItemVisible(itemName: string) {
     await expect(this.page.getByText(itemName)).toBeVisible();
+  }
+
+  async clickReserveButton(itemId: string) {
+    const reserveButton = this.page.locator(`[data-test-id="reserve-button-${itemId}"]`);
+    await reserveButton.click();
+  }
+
+  async confirmReserve() {
+    await this.reserveConfirmButton.click();
+    await this.page.waitForLoadState("networkidle");
+  }
+
+  async expectItemReservedByMe(itemId: string) {
+    const badge = this.page.locator(`[data-test-id="you-reserved-badge-${itemId}"]`);
+    await expect(badge).toBeVisible();
+  }
+
+  async expectItemReservedByOther(itemId: string) {
+    const badge = this.page.locator(`[data-test-id="reserved-badge-${itemId}"]`);
+    await expect(badge).toBeVisible();
+  }
+
+  async expectItemAvailable(itemId: string) {
+    const reserveButton = this.page.locator(`[data-test-id="reserve-button-${itemId}"]`);
+    await expect(reserveButton).toBeVisible();
+  }
+
+  async clickCancelReservationButton(itemId: string) {
+    const cancelButton = this.page.locator(`[data-test-id="cancel-reservation-${itemId}"]`);
+    await cancelButton.click();
+  }
+
+  async confirmCancelReservation() {
+    await this.cancelReservationConfirmButton.click();
+    await this.page.waitForLoadState("networkidle");
   }
 }
