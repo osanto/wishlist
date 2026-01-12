@@ -117,4 +117,32 @@ export class AdminPage {
   async expectCopyLinkButtonNotVisible() {
     await expect(this.copyLinkButton).not.toBeVisible();
   }
+
+  async getGuestUrl(): Promise<string> {
+    // Grant clipboard permissions (only works in Chromium)
+    try {
+      await this.page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    } catch (e) {
+      // Firefox/WebKit don't support clipboard-read permission, but clipboard API still works
+    }
+    
+    // Click the copy button to copy the guest URL to clipboard
+    await this.copyLinkButton.click();
+    
+    // Wait a bit for the copy to complete
+    await this.page.waitForTimeout(200);
+    
+    // Read from clipboard using Playwright's evaluate
+    const guestUrl = await this.page.evaluate(async () => {
+      return await navigator.clipboard.readText();
+    });
+    return guestUrl;
+  }
+
+  async getFirstItemId(): Promise<string> {
+    // Get the first item's ID from the reserve button data-test-id
+    const firstItemCard = this.page.locator('[data-test-id^="item-card-"]').first();
+    const itemId = await firstItemCard.getAttribute('data-test-id');
+    return itemId!.replace('item-card-', '');
+  }
 }
