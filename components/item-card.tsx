@@ -14,6 +14,7 @@ interface ItemCardProps {
   onDelete?: () => void;
   onReserve?: () => void;
   onCancelReservation?: () => void;
+  onUnreserve?: () => void;
 }
 
 export function ItemCard({
@@ -24,6 +25,7 @@ export function ItemCard({
   onDelete,
   onReserve,
   onCancelReservation,
+  onUnreserve,
 }: ItemCardProps) {
   return (
     <div
@@ -74,6 +76,15 @@ export function ItemCard({
 
         {variant === "admin" && (
           <div className="flex gap-2">
+            {item.isReserved && (
+              <button
+                onClick={onUnreserve}
+                data-test-id={`unreserve-item-${item.id}`}
+                className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm hover:bg-accent hover:text-accent-foreground"
+              >
+                Unreserve
+              </button>
+            )}
             <button
               onClick={onEdit}
               data-test-id={`edit-item-${item.id}`}

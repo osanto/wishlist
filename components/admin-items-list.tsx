@@ -5,8 +5,13 @@ import { toast } from "sonner";
 
 import { DeleteItemDialog } from "@/components/delete-item-dialog";
 import { EditItemDialog } from "@/components/edit-item-dialog";
+import { UnreserveItemDialog } from "@/components/unreserve-item-dialog";
 import { ItemCard } from "@/components/item-card";
-import { editItemAction, deleteItemAction } from "@/app/actions/items";
+import {
+  editItemAction,
+  deleteItemAction,
+  unreserveItemAction,
+} from "@/app/actions/items";
 
 interface Item {
   id: string;
@@ -27,6 +32,8 @@ export function AdminItemsList({ items, adminToken }: AdminItemsListProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState<Item | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [unreservingItem, setUnreservingItem] = useState<Item | null>(null);
+  const [isUnreserveDialogOpen, setIsUnreserveDialogOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const handleEdit = (item: Item) => {
@@ -77,6 +84,26 @@ export function AdminItemsList({ items, adminToken }: AdminItemsListProps) {
     });
   };
 
+  const handleUnreserve = (item: Item) => {
+    setUnreservingItem(item);
+    setIsUnreserveDialogOpen(true);
+  };
+
+  const handleUnreserveConfirm = async () => {
+    if (!unreservingItem) return;
+
+    startTransition(async () => {
+      const result = await unreserveItemAction(adminToken, unreservingItem.id);
+
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        setIsUnreserveDialogOpen(false);
+        toast.success("Reservation removed!");
+      }
+    });
+  };
+
   return (
     <>
       <div className="space-y-4">
@@ -87,6 +114,7 @@ export function AdminItemsList({ items, adminToken }: AdminItemsListProps) {
             variant="admin"
             onEdit={() => handleEdit(item)}
             onDelete={() => handleDelete(item)}
+            onUnreserve={() => handleUnreserve(item)}
           />
         ))}
       </div>
@@ -103,6 +131,13 @@ export function AdminItemsList({ items, adminToken }: AdminItemsListProps) {
         onOpenChange={setIsDeleteDialogOpen}
         item={deletingItem}
         onDelete={handleDeleteConfirm}
+      />
+
+      <UnreserveItemDialog
+        open={isUnreserveDialogOpen}
+        onOpenChange={setIsUnreserveDialogOpen}
+        itemName={unreservingItem?.name || ""}
+        onConfirm={handleUnreserveConfirm}
       />
     </>
   );

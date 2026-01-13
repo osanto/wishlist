@@ -3,6 +3,7 @@ import { AddItemDialog } from "./AddItemDialog";
 import { EditItemDialog } from "./EditItemDialog";
 import { DeleteItemDialog } from "./DeleteItemDialog";
 import { EditWishlistDialog } from "./EditWishlistDialog";
+import { UnreserveItemDialog } from "./UnreserveItemDialog";
 
 export class AdminPage {
   private readonly addItemButton: Locator;
@@ -16,8 +17,9 @@ export class AdminPage {
   public readonly editItemDialog: EditItemDialog;
   public readonly deleteItemDialog: DeleteItemDialog;
   public readonly editWishlistDialog: EditWishlistDialog;
+  public readonly unreserveItemDialog: UnreserveItemDialog;
 
-  constructor(private page: Page) {
+  constructor(public page: Page) {
     this.addItemButton = page.locator('[data-test-id="add-item-button"]');
     this.wishlistTitle = page.locator('[data-test-id="wishlist-title"]');
     this.editWishlistButton = page.locator('[data-test-id="edit-wishlist-button"]');
@@ -29,6 +31,7 @@ export class AdminPage {
     this.editItemDialog = new EditItemDialog(page);
     this.deleteItemDialog = new DeleteItemDialog(page);
     this.editWishlistDialog = new EditWishlistDialog(page);
+    this.unreserveItemDialog = new UnreserveItemDialog(page);
   }
 
   async goto(adminToken: string) {
@@ -144,5 +147,11 @@ export class AdminPage {
     const firstItemCard = this.page.locator('[data-test-id^="item-card-"]').first();
     const itemId = await firstItemCard.getAttribute('data-test-id');
     return itemId!.replace('item-card-', '');
+  }
+
+  async clickUnreserveItem(itemId: string) {
+    await this.page
+      .locator(`[data-test-id="unreserve-item-${itemId}"]`)
+      .click();
   }
 }

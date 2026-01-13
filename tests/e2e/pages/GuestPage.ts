@@ -83,4 +83,11 @@ export class GuestPage {
     await this.cancelReservationConfirmButton.click();
     await this.page.waitForLoadState("networkidle");
   }
+
+  async getFirstItemId(): Promise<string> {
+    // Get the first item's ID from the item card data-test-id
+    const firstItemCard = this.page.locator('[data-test-id^="item-card-"]').first();
+    const itemId = await firstItemCard.getAttribute('data-test-id');
+    return itemId!.replace('item-card-', '');
+  }
 }
