@@ -64,7 +64,7 @@ export async function setupWishlistWithItem(
     notes: itemNotes || "",
   });
   await adminPage.addItemDialog.submitAndWaitForClose();
-  await adminPage.expectItemVisible(itemName);
+  await adminPage.assertions.expectItemVisible(itemName);
 
   // 3. Get guest URL and item ID
   const guestUrl = await getGuestUrlFromDb(adminToken);

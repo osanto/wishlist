@@ -23,11 +23,11 @@ export abstract class ItemDialogBase {
   }
 
   async waitForOpen() {
-    await this.nameInput.waitFor({ state: "visible", timeout: 10000 });
+    await this.nameInput.waitFor({ state: "visible" });
   }
 
   async waitForClose() {
-    await this.nameInput.waitFor({ state: "hidden", timeout: 10000 });
+    await this.nameInput.waitFor({ state: "hidden" });
   }
 
   async fillName(name: string) {

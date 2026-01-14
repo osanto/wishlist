@@ -10,11 +10,11 @@ export class DeleteItemDialog {
   }
 
   async waitForOpen() {
-    await this.confirmButton.waitFor({ state: "visible", timeout: 10000 });
+    await this.confirmButton.waitFor({ state: "visible" });
   }
 
   async waitForClose() {
-    await this.confirmButton.waitFor({ state: "hidden", timeout: 10000 });
+    await this.confirmButton.waitFor({ state: "hidden" });
   }
 
   async confirm() {

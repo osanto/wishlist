@@ -4,6 +4,7 @@ import { EditItemDialog } from "./EditItemDialog";
 import { DeleteItemDialog } from "./DeleteItemDialog";
 import { EditWishlistDialog } from "./EditWishlistDialog";
 import { UnreserveItemDialog } from "./UnreserveItemDialog";
+import { ItemAssertions } from "../helpers/item-assertions";
 
 export class AdminPage {
   private readonly addItemButton: Locator;
@@ -18,6 +19,7 @@ export class AdminPage {
   public readonly deleteItemDialog: DeleteItemDialog;
   public readonly editWishlistDialog: EditWishlistDialog;
   public readonly unreserveItemDialog: UnreserveItemDialog;
+  public readonly assertions: ItemAssertions;
 
   constructor(public page: Page) {
     this.addItemButton = page.locator('[data-test-id="add-item-button"]');
@@ -32,6 +34,9 @@ export class AdminPage {
     this.deleteItemDialog = new DeleteItemDialog(page);
     this.editWishlistDialog = new EditWishlistDialog(page);
     this.unreserveItemDialog = new UnreserveItemDialog(page);
+    
+    // Initialize assertions helper
+    this.assertions = new ItemAssertions(page);
   }
 
   async goto(adminToken: string) {
@@ -43,12 +48,16 @@ export class AdminPage {
   }
 
   async expectWishlistTitle(title: string) {
-    await expect(this.wishlistTitle).toBeVisible({ timeout: 10000 });
+    await expect(this.wishlistTitle).toBeVisible();
     await expect(this.wishlistTitle).toHaveText(title);
   }
 
+  async expectWishlistTitleNotVisible() {
+    await expect(this.wishlistTitle).not.toBeVisible();
+  }
+
   async expectToBeOnAdminPage() {
-    await this.page.waitForURL(/\/admin\/[a-f0-9-]+/, { timeout: 15000 });
+    await this.page.waitForURL(/\/admin\/[a-f0-9-]+/);
   }
 
   async getAdminTokenFromUrl(): Promise<string | null> {
@@ -58,43 +67,31 @@ export class AdminPage {
   }
 
   async clickAddItem() {
-    await this.addItemButton.waitFor({ state: "visible", timeout: 10000 });
+    await this.addItemButton.waitFor({ state: "visible" });
     await this.addItemButton.click({ force: true }); // Force click to bypass hydration issues
   }
 
   async clickEditWishlist() {
-    await this.editWishlistButton.waitFor({ state: "visible", timeout: 10000 });
+    await this.editWishlistButton.waitFor({ state: "visible" });
     await this.editWishlistButton.click({ force: true });
   }
 
   async clickEditItemButton() {
     // Click the first edit button (using partial match for dynamic ID)
     const editButton = this.page.locator('[data-test-id^="edit-item-"]').first();
-    await editButton.waitFor({ state: "visible", timeout: 10000 });
+    await editButton.waitFor({ state: "visible" });
     await editButton.click({ force: true });
   }
 
   async clickDeleteItemButton() {
     // Click the first delete button (using partial match for dynamic ID)
     const deleteButton = this.page.locator('[data-test-id^="delete-item-"]').first();
-    await deleteButton.waitFor({ state: "visible", timeout: 10000 });
+    await deleteButton.waitFor({ state: "visible" });
     await deleteButton.click({ force: true });
   }
 
-  async expectItemVisible(itemName: string) {
-    await expect(this.page.getByText(itemName)).toBeVisible({
-      timeout: 10000,
-    });
-  }
-
-  async expectItemNotVisible(itemName: string) {
-    await expect(this.page.getByText(itemName)).not.toBeVisible({
-      timeout: 10000,
-    });
-  }
-
   async expectEmptyState() {
-    await expect(this.emptyState).toBeVisible({ timeout: 10000 });
+    await expect(this.emptyState).toBeVisible();
   }
 
   async expectAddItemButtonVisible() {
@@ -132,9 +129,6 @@ export class AdminPage {
     // Click the copy button to copy the guest URL to clipboard
     await this.copyLinkButton.click();
     
-    // Wait a bit for the copy to complete
-    await this.page.waitForTimeout(200);
-    
     // Read from clipboard using Playwright's evaluate
     const guestUrl = await this.page.evaluate(async () => {
       return await navigator.clipboard.readText();
@@ -153,5 +147,13 @@ export class AdminPage {
     await this.page
       .locator(`[data-test-id="unreserve-item-${itemId}"]`)
       .click();
+  }
+
+  async expectReservedBadgeVisible() {
+    await expect(this.page.getByText("Reserved")).toBeVisible();
+  }
+
+  async expectReservedBadgeNotVisible() {
+    await expect(this.page.getByText("Reserved")).not.toBeVisible();
   }
 }

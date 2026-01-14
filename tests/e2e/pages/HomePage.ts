@@ -11,7 +11,7 @@ export class HomePage {
     const createButton = this.page.getByRole("button", {
       name: "Create Wishlist",
     });
-    await expect(createButton).toBeVisible({ timeout: 15000 });
+    await expect(createButton).toBeVisible();
     await createButton.click();
   }
 

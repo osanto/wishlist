@@ -40,10 +40,10 @@ export class EditWishlistDialog {
   }
 
   async expectDialogOpen() {
-    await expect(this.dialog).toBeVisible({ timeout: 5000 });
+    await expect(this.dialog).toBeVisible();
   }
 
   async expectDialogClosed() {
-    await expect(this.dialog).not.toBeVisible({ timeout: 5000 });
+    await expect(this.dialog).not.toBeVisible();
   }
 }

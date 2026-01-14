@@ -2,7 +2,7 @@ import { test, expect } from "./fixtures/wishlist.fixture";
 import { GuestPage } from "./pages/GuestPage";
 import { setupWishlistWithItem } from "./helpers/test-setup";
 
-test.describe("Guest Reservation Flow", () => {
+test.describe("Guest Reservations", () => {
   test("guest can reserve, persist, and cancel reservation", async ({
     context,
     homePage,
@@ -10,14 +10,21 @@ test.describe("Guest Reservation Flow", () => {
     guestPage,
     createdWishlists,
   }) => {
+    // Test data
+    const item = {
+      name: "Wireless Headphones",
+      link: "https://example.com/headphones",
+      notes: "Black or silver",
+    };
+
     // 1. Set up wishlist with an item
     const { guestUrl, itemId } = await setupWishlistWithItem(
       homePage,
       adminPage,
       createdWishlists,
-      "Wireless Headphones",
-      "https://example.com/headphones",
-      "Black or silver"
+      item.name,
+      item.link,
+      item.notes
     );
 
     // 2. Open guest page in new context (different user)
@@ -57,14 +64,21 @@ test.describe("Guest Reservation Flow", () => {
     adminPage,
     createdWishlists,
   }) => {
+    // Test data
+    const item = {
+      name: "Monitor",
+      link: "https://example.com/monitor",
+      notes: "27 inch 4K",
+    };
+
     // 1. Set up wishlist with an item
     const { guestUrl, itemId } = await setupWishlistWithItem(
       homePage,
       adminPage,
       createdWishlists,
-      "Monitor",
-      "https://example.com/monitor",
-      "27 inch 4K"
+      item.name,
+      item.link,
+      item.notes
     );
 
     // 2. First guest reserves the item
@@ -83,10 +97,6 @@ test.describe("Guest Reservation Flow", () => {
     const guest2Context = await context.browser()!.newContext();
     const guest2Page = await guest2Context.newPage();
     const guest2 = new GuestPage(guest2Page);
-    
-    // Wait a bit to ensure revalidation has completed
-    await guest1Page.waitForTimeout(1000);
-    
     await guest2Page.goto(guestUrl, { waitUntil: "networkidle" });
 
     // 5. Verify second guest sees "Reserved" badge (cannot reserve)

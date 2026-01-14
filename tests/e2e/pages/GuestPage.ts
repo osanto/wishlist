@@ -1,4 +1,5 @@
 import { Page, expect, Locator } from "@playwright/test";
+import { ItemAssertions } from "../helpers/item-assertions";
 
 export class GuestPage {
   private readonly wishlistTitle: Locator;
@@ -10,6 +11,7 @@ export class GuestPage {
   private readonly deleteItemButton: Locator;
   private readonly reserveConfirmButton: Locator;
   private readonly cancelReservationConfirmButton: Locator;
+  public readonly assertions: ItemAssertions;
 
   constructor(public page: Page) {
     this.wishlistTitle = page.locator('[data-test-id="wishlist-title"]');
@@ -21,6 +23,9 @@ export class GuestPage {
     this.deleteItemButton = page.locator('[data-test-id="delete-item-button"]');
     this.reserveConfirmButton = page.locator('[data-test-id="reserve-item-confirm-button"]');
     this.cancelReservationConfirmButton = page.locator('[data-test-id="cancel-reservation-confirm-button"]');
+    
+    // Initialize assertions helper
+    this.assertions = new ItemAssertions(page);
   }
 
   async goto(guestToken: string) {
@@ -28,8 +33,12 @@ export class GuestPage {
   }
 
   async expectWishlistTitle(title: string) {
-    await expect(this.wishlistTitle).toBeVisible({ timeout: 10000 });
+    await expect(this.wishlistTitle).toBeVisible();
     await expect(this.wishlistTitle).toHaveText(title);
+  }
+
+  async expectWishlistTitleNotVisible() {
+    await expect(this.wishlistTitle).not.toBeVisible();
   }
 
   async expectPageLoaded() {
@@ -43,10 +52,6 @@ export class GuestPage {
     await expect(this.copyLinkButton).not.toBeVisible();
     await expect(this.editItemButton).not.toBeVisible();
     await expect(this.deleteItemButton).not.toBeVisible();
-  }
-
-  async expectItemVisible(itemName: string) {
-    await expect(this.page.getByText(itemName)).toBeVisible();
   }
 
   async clickReserveButton(itemId: string) {

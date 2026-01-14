@@ -1,5 +1,6 @@
 import { test, expect } from "./fixtures/wishlist.fixture";
 import { setupWishlist, setupWishlistWithItem } from "./helpers/test-setup";
+import { GuestPage } from "./pages/GuestPage";
 
 test.describe("Admin Item Management", () => {
   test("admin can add an item to wishlist and guest can see it", async ({
@@ -30,16 +31,16 @@ test.describe("Admin Item Management", () => {
     await adminPage.addItemDialog.submitAndWaitForClose();
 
     // 4. Verify item appears in admin view
-    await adminPage.expectItemVisible(item.name);
+    await adminPage.assertions.expectItemVisible(item.name);
 
     // 5. Verify item also appears in guest view
-    const guestPage = await context.newPage();
-    await guestPage.goto(`/guest/${guestToken}`);
-    await guestPage.waitForLoadState("networkidle");
-    await expect(guestPage.getByText(item.name)).toBeVisible();
+    const guestPageContext = await context.newPage();
+    const guestPage = new GuestPage(guestPageContext);
+    await guestPage.goto(guestToken);
+    await guestPage.assertions.expectItemVisible(item.name);
 
     // Cleanup
-    await guestPage.close();
+    await guestPageContext.close();
   });
 
   test("admin can edit an item", async ({
@@ -70,7 +71,7 @@ test.describe("Admin Item Management", () => {
       originalItem.link,
       originalItem.notes
     );
-    await adminPage.expectItemVisible(originalItem.name);
+    await adminPage.assertions.expectItemVisible(originalItem.name);
 
     // 2. Click edit button on the item
     await adminPage.clickEditItemButton();
@@ -84,38 +85,36 @@ test.describe("Admin Item Management", () => {
     await adminPage.editItemDialog.submitAndWaitForClose();
 
     // 4. Verify updated item appears in admin view
-    await adminPage.expectItemVisible(updatedItem.name);
+    await adminPage.assertions.expectItemVisible(updatedItem.name);
     
     // 5. Verify original name is no longer visible in admin view
-    await expect(page.getByText(originalItem.name)).not.toBeVisible();
+    await adminPage.assertions.expectItemNotVisible(originalItem.name);
 
     // 6. Verify updated link and notes are present in admin view
-    const pageContent = await page.content();
-    expect(pageContent).toContain(updatedItem.link);
-    expect(pageContent).toContain(updatedItem.notes);
+    await adminPage.assertions.expectItemLinkVisible(updatedItem.link);
+    await adminPage.assertions.expectItemNotesVisible(updatedItem.notes);
     
     // 7. Verify original link and notes are no longer present in admin view
-    expect(pageContent).not.toContain(originalItem.link);
-    expect(pageContent).not.toContain(originalItem.notes);
+    await adminPage.assertions.expectItemLinkNotVisible(originalItem.link);
+    await adminPage.assertions.expectItemNotesNotVisible(originalItem.notes);
 
     // 8. Verify updated item also appears in guest view
-    const guestPage = await context.newPage();
-    await guestPage.goto(`/guest/${guestToken}`);
-    await guestPage.waitForLoadState("networkidle");
-    await expect(guestPage.getByText(updatedItem.name)).toBeVisible();
+    const guestPageContext = await context.newPage();
+    const guestPage = new GuestPage(guestPageContext);
+    await guestPage.goto(guestToken);
+    await guestPage.assertions.expectItemVisible(updatedItem.name);
     
     // 9. Verify original item name is not visible in guest view
-    await expect(guestPage.getByText(originalItem.name)).not.toBeVisible();
+    await guestPage.assertions.expectItemNotVisible(originalItem.name);
 
     // 10. Verify updated link and notes in guest view
-    const guestPageContent = await guestPage.content();
-    expect(guestPageContent).toContain(updatedItem.link);
-    expect(guestPageContent).toContain(updatedItem.notes);
-    expect(guestPageContent).not.toContain(originalItem.link);
-    expect(guestPageContent).not.toContain(originalItem.notes);
+    await guestPage.assertions.expectItemLinkVisible(updatedItem.link);
+    await guestPage.assertions.expectItemNotesVisible(updatedItem.notes);
+    await guestPage.assertions.expectItemLinkNotVisible(originalItem.link);
+    await guestPage.assertions.expectItemNotesNotVisible(originalItem.notes);
 
     // Cleanup
-    await guestPage.close();
+    await guestPageContext.close();
   });
 
   test("admin can delete an item", async ({
@@ -142,10 +141,10 @@ test.describe("Admin Item Management", () => {
     );
 
     // 2. Open guest page in a new tab to verify item is visible
-    const guestPage = await context.newPage();
-    await guestPage.goto(`/guest/${guestToken}`);
-    await guestPage.waitForLoadState("networkidle");
-    await expect(guestPage.getByText(item.name)).toBeVisible();
+    const guestPageContext = await context.newPage();
+    const guestPage = new GuestPage(guestPageContext);
+    await guestPage.goto(guestToken);
+    await guestPage.assertions.expectItemVisible(item.name);
 
     // 3. Back to admin page - click delete button on the item
     await adminPage.clickDeleteItemButton();
@@ -154,15 +153,15 @@ test.describe("Admin Item Management", () => {
     await adminPage.deleteItemDialog.confirmAndWaitForClose();
 
     // 5. Verify item is no longer visible in admin view
-    await adminPage.expectItemNotVisible(item.name);
+    await adminPage.assertions.expectItemNotVisible(item.name);
 
     // 6. Verify item is also no longer visible in guest view
-    await guestPage.reload();
-    await guestPage.waitForLoadState("networkidle");
-    await expect(guestPage.getByText(item.name)).not.toBeVisible();
+    await guestPageContext.reload();
+    await guestPageContext.waitForLoadState("networkidle");
+    await guestPage.assertions.expectItemNotVisible(item.name);
 
     // Cleanup
-    await guestPage.close();
+    await guestPageContext.close();
   });
 
   test("admin can unreserve any item", async ({
@@ -191,7 +190,6 @@ test.describe("Admin Item Management", () => {
 
     // 2. Open guest page in new context and reserve the item
     const newPage = await context.newPage();
-    const { GuestPage } = await import("./pages/GuestPage");
     const guestPage = new GuestPage(newPage);
     await guestPage.goto(guestToken);
 
@@ -204,14 +202,14 @@ test.describe("Admin Item Management", () => {
 
     // 5. Go back to admin page and verify the Reserved badge is visible
     await adminPage.page.reload({ waitUntil: "networkidle" });
-    await expect(adminPage.page.getByText("Reserved")).toBeVisible();
+    await adminPage.expectReservedBadgeVisible();
 
     // 6. Click unreserve button and confirm
     await adminPage.clickUnreserveItem(itemId);
     await adminPage.unreserveItemDialog.confirmAndWaitForClose();
     
     // 7. Wait for the action to complete and verify badge is gone
-    await expect(adminPage.page.getByText("Reserved")).not.toBeVisible({ timeout: 5000 });
+    await adminPage.expectReservedBadgeNotVisible();
 
     // 8. Verify guest page shows item as available again
     await guestPage.page.reload({ waitUntil: "networkidle" });
@@ -219,5 +217,61 @@ test.describe("Admin Item Management", () => {
 
     // Cleanup
     await newPage.close();
+  });
+
+  test("item link opens in new tab on admin and guest pages", async ({
+    context,
+    homePage,
+    adminPage,
+    createdWishlists,
+  }) => {
+    // Test data
+    const item = {
+      name: "Test Item with Link",
+      link: "https://example.com/test-item",
+      notes: "Test notes",
+    };
+
+    // 1. Set up wishlist with an item
+    const { guestToken } = await setupWishlistWithItem(
+      homePage,
+      adminPage,
+      createdWishlists,
+      item.name,
+      item.link,
+      item.notes
+    );
+
+    // 2. Verify link is visible in admin view
+    await adminPage.assertions.expectItemLinkVisible(item.link);
+
+    // 3. Click the "View Item" link on admin page and wait for new page
+    const [adminLinkPage] = await Promise.all([
+      context.waitForEvent("page"),
+      adminPage.page.locator(`a[href="${item.link}"]`).click(),
+    ]);
+
+    // 4. Verify new page opened with correct URL
+    await expect(adminLinkPage).toHaveURL(item.link);
+    await adminLinkPage.close();
+
+    // 5. Open guest page and verify link works there too
+    const guestPageContext = await context.newPage();
+    const guestPage = new GuestPage(guestPageContext);
+    await guestPage.goto(guestToken);
+    await guestPage.assertions.expectItemLinkVisible(item.link);
+
+    // 6. Click the "View Item" link on guest page and wait for new page
+    const [guestLinkPage] = await Promise.all([
+      context.waitForEvent("page"),
+      guestPageContext.locator(`a[href="${item.link}"]`).click(),
+    ]);
+
+    // 7. Verify new page opened with correct URL
+    await expect(guestLinkPage).toHaveURL(item.link);
+
+    // 8. Cleanup
+    await guestLinkPage.close();
+    await guestPageContext.close();
   });
 });
