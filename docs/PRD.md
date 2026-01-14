@@ -45,6 +45,7 @@ Items:
 - Edit items
 - Delete items
 - See which items are reserved (but not who reserved)
+- Unreserve any item (override guest reservations)
 
 ### **2. Guest User**
 
@@ -145,7 +146,7 @@ Guest identity is stored locally using a **local reservation token** (localStora
 
 **Token Storage:**
 
-- Admin/guest tokens: URL parameter on first visit → saved to localStorage → URL cleaned
+- Admin/guest tokens: URL parameter on first visit → saved to localStorage → URL remains (needed for Next.js routing)
 - Reservation token: localStorage only (never in URL)
 
 **Sharing:**
@@ -194,9 +195,10 @@ Guests can reserve **multiple** items. Reservations are tracked anonymously by t
 
 **Success Feedback:**
 
-- Item reserved: Confirmation message
-- Link copied: Confirmation message
-- Changes saved: Visual confirmation
+- Item reserved: Toast notification
+- Link copied: Toast notification
+- Changes saved: Toast notification
+- All actions provide immediate visual feedback via toast notifications
 
 **Error Handling:**
 
@@ -216,18 +218,12 @@ Guests can reserve **multiple** items. Reservations are tracked anonymously by t
 - Anonymous reservations
 - Admin cannot see the identity
 
-# 7. **Out of Scope (Not in MVP)**
+# 7. **Out of Scope**
 
 The following features are intentionally excluded:
 
-- ❌ Auto-fetch images from product URLs
 - ❌ Multiple wishlists per user (schema supports it, but UI doesn't expose it yet)
-- ❌ Item quantities (e.g., "need 3 of these")
 - ❌ User accounts or authentication
 - ❌ Email notifications
 - ❌ Guest names or messages
 - ❌ Search or filter items
-- ❌ Wishlist expiration dates
-- ❌ Password protection for wishlists
-
-**Rationale:** Focus MVP on core value proposition. Features can be added based on user feedback.

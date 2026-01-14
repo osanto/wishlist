@@ -12,6 +12,8 @@ Wishlist MVP with anonymous admin and guest access. Frontend uses Next.js, backe
 - **next-themes** — Dark mode with system preference detection
 - **ShadCN/UI** — Pre-built component library
 - **Zod** — Schema validation
+- **react-hook-form** — Form management and validation
+- **Sonner** — Toast notifications
 - **LocalStorage** — Store reservation token
 
 ## 3. **Backend - Supabase**
@@ -61,7 +63,6 @@ Supports both single and multiple wishlists with no changes later.
 | `wishlist_id`       | UUID            | FK → wishlist.id                           |
 | `name`              | text            | Item name                                  |
 | `link`              | text            | Optional                                   |
-| `image_url`         | text            | Optional                                   |
 | `notes`             | text            | Optional                                   |
 | `reserved_by_token` | text (nullable) | Guest reservation token (NULL = available) |
 | `is_reserved`       | boolean         | Convenience boolean                        |
@@ -85,9 +86,9 @@ The app does not use login
 
 ## **Token Storage Strategy**
 
-- Admin/guest tokens: URL on first visit → localStorage → URL cleaned via `window.history.replaceState()`
+- Admin/guest tokens: URL parameter on first visit → saved to localStorage → URL remains (needed for Next.js routing)
 - Reservation token: localStorage only, never in URL
-- Rationale: Shareable links work, but browser history stays clean
+- Rationale: Shareable links work, tokens remain in URL for Next.js dynamic routing
 
 ## **LocalStorage Edge Cases**
 
@@ -122,6 +123,13 @@ The app does not use login
 - Service role key never exposed to browser
 - Tokens validated before every mutation
 - Race conditions prevented with database constraints
+- Security headers configured in `next.config.ts`:
+  - X-Frame-Options (clickjacking protection)
+  - X-Content-Type-Options (MIME sniffing protection)
+  - Strict-Transport-Security (HSTS)
+  - Referrer-Policy (token leakage prevention)
+  - X-XSS-Protection
+  - Permissions-Policy
 
 **Post-MVP Enhancement:**
 
@@ -146,6 +154,8 @@ Server Actions for Writes
 
 ### **Unit tests - Vitest**
 
+- **57 unit tests** covering all server actions and helper functions
+
 ### **Integration tests (API) - Not in MVP**
 
 Integration tests are unnecessary for MVP because:
@@ -155,6 +165,11 @@ Integration tests are unnecessary for MVP because:
 - Add integration tests post-MVP if complexity increases
 
 ### **E2E tests - Playwright**
+
+- **18 E2E tests** covering critical user flows
+- Tests run across 3 browsers (Chromium, Firefox, WebKit)
+- Uses Page Object Model (POM) pattern for maintainability
+- Tests cover: wishlist creation, item management, reservations, error handling
 
 ### **Linting - ESLint and Prettier**
 
@@ -207,14 +222,33 @@ Workflow:
 
 ## Components
 
-- ThemeToggle
-- ItemCard
-- AddItemForm
-- EditItemForm
-- DeleteItemForm
-- ReserveItemModal
-- CancelReservationDialog
-- EditItemDialog
-- DeleteItemDialog
+### Core Components
+- `AppHeader` - Header with theme toggle
+- `ThemeToggle` - Dark/light mode switcher
+- `ThemeProvider` - Theme context provider
+- `TokenHandler` - Client component for token persistence
+
+### Page Components
+- `AdminPageClient` - Client wrapper for admin page
+- `AdminPageHeader` - Admin page header with edit/copy functionality
+- `AdminItemsList` - List of items with admin controls
+- `GuestPageClient` - Client wrapper for guest page
+- `GuestItemsList` - List of items with reservation controls
+
+### Item Components
+- `ItemCard` - Display item with name, link, notes, and reservation status
+- `EmptyState` - Empty state when no items exist
+
+### Dialog Components
+- `AddItemDialog` - Dialog for adding new items
+- `EditItemDialog` - Dialog for editing items
+- `DeleteItemDialog` - Confirmation dialog for deleting items
+- `EditWishlistDialog` - Dialog for editing wishlist title/description
+- `ReserveItemModal` - Modal for reserving items (guest)
+- `CancelReservationDialog` - Dialog for canceling reservations (guest)
+- `UnreserveItemDialog` - Dialog for unreserving items (admin)
+
+### Utility Components
+- `ShareLinkSection` - Section with guest link and copy button
 
 Everything is reusable for multi-wishlist support later.
