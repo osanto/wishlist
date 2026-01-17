@@ -33,7 +33,7 @@ export const test = base.extend<WishlistFixtures>({
     await use(new GuestPage(page));
   },
 
-  createdWishlists: async ({ }, use) => {
+  createdWishlists: async ({}, use) => {
     const adminTokens: string[] = [];
 
     // Provide the array to the test
