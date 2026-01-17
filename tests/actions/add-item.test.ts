@@ -1,20 +1,20 @@
-import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
-import { addItemAction } from '@/app/actions/items';
-import { supabase } from '@/lib/supabase';
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
+import { addItemAction } from "@/app/actions/items";
+import { supabase } from "@/lib/supabase";
 
 // Mock Supabase
-vi.mock('@/lib/supabase', () => {
+vi.mock("@/lib/supabase", () => {
   const createMockChain = () => {
     const mockSingle = vi.fn();
     const mockEq = vi.fn(() => ({ single: mockSingle }));
-    const mockSelect = vi.fn(() => ({ 
+    const mockSelect = vi.fn(() => ({
       eq: mockEq,
       single: mockSingle,
     }));
-    const mockInsert = vi.fn(() => ({ 
+    const mockInsert = vi.fn(() => ({
       select: mockSelect,
     }));
-    
+
     return {
       select: mockSelect,
       insert: mockInsert,
@@ -30,27 +30,27 @@ vi.mock('@/lib/supabase', () => {
   };
 });
 
-vi.mock('next/cache', () => ({
+vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
-describe('addItemAction', () => {
-  const mockAdminToken = 'valid-admin-token-123';
-  const mockWishlistId = 'wishlist-id-456';
+describe("addItemAction", () => {
+  const mockAdminToken = "valid-admin-token-123";
+  const mockWishlistId = "wishlist-id-456";
   const mockItemData = {
-    name: 'Wireless Headphones',
-    link: 'https://example.com/headphones',
-    notes: 'Black or silver preferred',
+    name: "Wireless Headphones",
+    link: "https://example.com/headphones",
+    notes: "Black or silver preferred",
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
-  it('should add item when valid admin token is provided', async () => {
+  it("should add item when valid admin token is provided", async () => {
     const mockFrom = supabase.from as Mock;
-    
+
     // First call: wishlist validation
     mockFrom.mockReturnValueOnce({
       select: vi.fn().mockReturnValue({
@@ -69,7 +69,7 @@ describe('addItemAction', () => {
         select: vi.fn().mockReturnValue({
           single: vi.fn().mockResolvedValue({
             data: {
-              id: 'new-item-id',
+              id: "new-item-id",
               wishlist_id: mockWishlistId,
               name: mockItemData.name,
               link: mockItemData.link,
@@ -87,10 +87,10 @@ describe('addItemAction', () => {
     const result = await addItemAction(mockAdminToken, mockItemData);
 
     // Verify wishlist was validated
-    expect(supabase.from).toHaveBeenCalledWith('wishlist');
+    expect(supabase.from).toHaveBeenCalledWith("wishlist");
 
     // Verify item was inserted
-    expect(supabase.from).toHaveBeenCalledWith('items');
+    expect(supabase.from).toHaveBeenCalledWith("items");
 
     // Verify success response
     expect(result.error).toBeUndefined();
@@ -98,8 +98,8 @@ describe('addItemAction', () => {
     expect(result.data?.name).toBe(mockItemData.name);
   });
 
-  it('should return error when admin token is invalid', async () => {
-    const invalidToken = 'invalid-token-999';
+  it("should return error when admin token is invalid", async () => {
+    const invalidToken = "invalid-token-999";
     const mockFrom = supabase.from as Mock;
 
     // Mock wishlist validation failure
@@ -108,7 +108,7 @@ describe('addItemAction', () => {
         eq: vi.fn().mockReturnValue({
           single: vi.fn().mockResolvedValue({
             data: null,
-            error: { message: 'No rows found', code: 'PGRST116' },
+            error: { message: "No rows found", code: "PGRST116" },
           }),
         }),
       }),
@@ -117,45 +117,45 @@ describe('addItemAction', () => {
     const result = await addItemAction(invalidToken, mockItemData);
 
     // Verify error response
-    expect(result.error).toBe('Invalid admin token');
+    expect(result.error).toBe("Invalid admin token");
     expect(result.data).toBeUndefined();
 
     // Verify wishlist validation was attempted
-    expect(supabase.from).toHaveBeenCalledWith('wishlist');
+    expect(supabase.from).toHaveBeenCalledWith("wishlist");
   });
 
-  it('should return error when item name is empty', async () => {
+  it("should return error when item name is empty", async () => {
     const invalidItemData = {
-      name: '',
-      link: 'https://example.com',
-      notes: 'Some notes',
+      name: "",
+      link: "https://example.com",
+      notes: "Some notes",
     };
 
     const result = await addItemAction(mockAdminToken, invalidItemData);
 
     // Verify validation error
-    expect(result.error).toBe('Item name is required');
+    expect(result.error).toBe("Item name is required");
     expect(result.data).toBeUndefined();
 
     // Verify no database calls were made
     expect(supabase.from).not.toHaveBeenCalled();
   });
 
-  it('should return error when item name is only whitespace', async () => {
+  it("should return error when item name is only whitespace", async () => {
     const invalidItemData = {
-      name: '   ',
-      link: 'https://example.com',
-      notes: 'Some notes',
+      name: "   ",
+      link: "https://example.com",
+      notes: "Some notes",
     };
 
     const result = await addItemAction(mockAdminToken, invalidItemData);
 
     // Verify validation error
-    expect(result.error).toBe('Item name is required');
+    expect(result.error).toBe("Item name is required");
     expect(result.data).toBeUndefined();
   });
 
-  it('should handle database errors gracefully', async () => {
+  it("should handle database errors gracefully", async () => {
     const mockFrom = supabase.from as Mock;
 
     // First call: wishlist validation success
@@ -176,7 +176,7 @@ describe('addItemAction', () => {
         select: vi.fn().mockReturnValue({
           single: vi.fn().mockResolvedValue({
             data: null,
-            error: { message: 'Database error', code: 'DB_ERROR' },
+            error: { message: "Database error", code: "DB_ERROR" },
           }),
         }),
       }),
@@ -185,18 +185,18 @@ describe('addItemAction', () => {
     const result = await addItemAction(mockAdminToken, mockItemData);
 
     // Verify error response
-    expect(result.error).toBe('Failed to add item');
+    expect(result.error).toBe("Failed to add item");
     expect(result.data).toBeUndefined();
 
     // Verify error was logged
     expect(console.error).toHaveBeenCalled();
   });
 
-  it('should allow optional fields (link and notes) to be empty', async () => {
+  it("should allow optional fields (link and notes) to be empty", async () => {
     const minimalItemData = {
-      name: 'Simple Item',
-      link: '',
-      notes: '',
+      name: "Simple Item",
+      link: "",
+      notes: "",
     };
     const mockFrom = supabase.from as Mock;
 
@@ -218,7 +218,7 @@ describe('addItemAction', () => {
         select: vi.fn().mockReturnValue({
           single: vi.fn().mockResolvedValue({
             data: {
-              id: 'new-item-id',
+              id: "new-item-id",
               wishlist_id: mockWishlistId,
               name: minimalItemData.name,
               link: null,

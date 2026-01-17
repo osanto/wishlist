@@ -19,9 +19,7 @@ export default defineConfig({
   /* Use multiple workers in CI for faster execution */
   workers: process.env.CI ? 4 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [
-    ["html", { outputFolder: "./tests/e2e/playwright-report" }],
-  ],
+  reporter: [["html", { outputFolder: "./tests/e2e/playwright-report" }]],
   /* Output directory for test results */
   outputDir: "./tests/e2e/test-results",
 

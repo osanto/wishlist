@@ -17,7 +17,11 @@ test.describe("Admin Item Management", () => {
     };
 
     // 1. Set up wishlist
-    const { guestToken } = await setupWishlist(homePage, adminPage, createdWishlists);
+    const { guestToken } = await setupWishlist(
+      homePage,
+      adminPage,
+      createdWishlists
+    );
 
     // 2. Open add item dialog
     await adminPage.clickAddItem();
@@ -86,14 +90,14 @@ test.describe("Admin Item Management", () => {
 
     // 4. Verify updated item appears in admin view
     await adminPage.assertions.expectItemVisible(updatedItem.name);
-    
+
     // 5. Verify original name is no longer visible in admin view
     await adminPage.assertions.expectItemNotVisible(originalItem.name);
 
     // 6. Verify updated link and notes are present in admin view
     await adminPage.assertions.expectItemLinkVisible(updatedItem.link);
     await adminPage.assertions.expectItemNotesVisible(updatedItem.notes);
-    
+
     // 7. Verify original link and notes are no longer present in admin view
     await adminPage.assertions.expectItemLinkNotVisible(originalItem.link);
     await adminPage.assertions.expectItemNotesNotVisible(originalItem.notes);
@@ -103,7 +107,7 @@ test.describe("Admin Item Management", () => {
     const guestPage = new GuestPage(guestPageContext);
     await guestPage.goto(guestToken);
     await guestPage.assertions.expectItemVisible(updatedItem.name);
-    
+
     // 9. Verify original item name is not visible in guest view
     await guestPage.assertions.expectItemNotVisible(originalItem.name);
 
@@ -207,7 +211,7 @@ test.describe("Admin Item Management", () => {
     // 6. Click unreserve button and confirm
     await adminPage.clickUnreserveItem(itemId);
     await adminPage.unreserveItemDialog.confirmAndWaitForClose();
-    
+
     // 7. Wait for the action to complete and verify badge is gone
     await adminPage.expectReservedBadgeNotVisible();
 

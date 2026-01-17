@@ -38,7 +38,10 @@ export function UnreserveItemDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]" data-test-id="unreserve-item-dialog">
+      <DialogContent
+        className="sm:max-w-[425px]"
+        data-test-id="unreserve-item-dialog"
+      >
         <DialogHeader>
           <DialogTitle>Unreserve Item</DialogTitle>
         </DialogHeader>

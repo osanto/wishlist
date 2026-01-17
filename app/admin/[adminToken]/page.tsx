@@ -55,18 +55,22 @@ export default async function AdminPage({ params }: AdminPageProps) {
       <AppHeader />
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-4xl p-6 space-y-8">
-        <AdminPageHeader 
-          wishlist={{
-            id: wishlist.id,
-            title: wishlist.title,
-            description: wishlist.description || undefined,
-          }} 
-          shareUrl={guestUrl}
-          adminToken={adminToken}
-        />
+          <AdminPageHeader
+            wishlist={{
+              id: wishlist.id,
+              title: wishlist.title,
+              description: wishlist.description || undefined,
+            }}
+            shareUrl={guestUrl}
+            adminToken={adminToken}
+          />
 
           {/* Items Section - now using real data from database */}
-          <AdminPageClient items={items} guestUrl={guestUrl} adminToken={adminToken} />
+          <AdminPageClient
+            items={items}
+            guestUrl={guestUrl}
+            adminToken={adminToken}
+          />
         </div>
       </div>
     </>

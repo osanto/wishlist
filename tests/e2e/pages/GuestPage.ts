@@ -16,14 +16,22 @@ export class GuestPage {
   constructor(public page: Page) {
     this.wishlistTitle = page.locator('[data-test-id="wishlist-title"]');
     this.addItemButton = page.locator('[data-test-id="add-item-button"]');
-    this.editWishlistButton = page.locator('[data-test-id="edit-wishlist-button"]');
-    this.shareSection = page.locator('[data-test-id="share-with-guests-section"]');
+    this.editWishlistButton = page.locator(
+      '[data-test-id="edit-wishlist-button"]'
+    );
+    this.shareSection = page.locator(
+      '[data-test-id="share-with-guests-section"]'
+    );
     this.copyLinkButton = page.locator('[data-test-id="copy-link-button"]');
     this.editItemButton = page.locator('[data-test-id="edit-item-button"]');
     this.deleteItemButton = page.locator('[data-test-id="delete-item-button"]');
-    this.reserveConfirmButton = page.locator('[data-test-id="reserve-item-confirm-button"]');
-    this.cancelReservationConfirmButton = page.locator('[data-test-id="cancel-reservation-confirm-button"]');
-    
+    this.reserveConfirmButton = page.locator(
+      '[data-test-id="reserve-item-confirm-button"]'
+    );
+    this.cancelReservationConfirmButton = page.locator(
+      '[data-test-id="cancel-reservation-confirm-button"]'
+    );
+
     // Initialize assertions helper
     this.assertions = new ItemAssertions(page);
   }
@@ -55,7 +63,9 @@ export class GuestPage {
   }
 
   async clickReserveButton(itemId: string) {
-    const reserveButton = this.page.locator(`[data-test-id="reserve-button-${itemId}"]`);
+    const reserveButton = this.page.locator(
+      `[data-test-id="reserve-button-${itemId}"]`
+    );
     await reserveButton.click();
   }
 
@@ -65,22 +75,30 @@ export class GuestPage {
   }
 
   async expectItemReservedByMe(itemId: string) {
-    const badge = this.page.locator(`[data-test-id="you-reserved-badge-${itemId}"]`);
+    const badge = this.page.locator(
+      `[data-test-id="you-reserved-badge-${itemId}"]`
+    );
     await expect(badge).toBeVisible();
   }
 
   async expectItemReservedByOther(itemId: string) {
-    const badge = this.page.locator(`[data-test-id="reserved-badge-${itemId}"]`);
+    const badge = this.page.locator(
+      `[data-test-id="reserved-badge-${itemId}"]`
+    );
     await expect(badge).toBeVisible();
   }
 
   async expectItemAvailable(itemId: string) {
-    const reserveButton = this.page.locator(`[data-test-id="reserve-button-${itemId}"]`);
+    const reserveButton = this.page.locator(
+      `[data-test-id="reserve-button-${itemId}"]`
+    );
     await expect(reserveButton).toBeVisible();
   }
 
   async clickCancelReservationButton(itemId: string) {
-    const cancelButton = this.page.locator(`[data-test-id="cancel-reservation-${itemId}"]`);
+    const cancelButton = this.page.locator(
+      `[data-test-id="cancel-reservation-${itemId}"]`
+    );
     await cancelButton.click();
   }
 
@@ -91,8 +109,10 @@ export class GuestPage {
 
   async getFirstItemId(): Promise<string> {
     // Get the first item's ID from the item card data-test-id
-    const firstItemCard = this.page.locator('[data-test-id^="item-card-"]').first();
-    const itemId = await firstItemCard.getAttribute('data-test-id');
-    return itemId!.replace('item-card-', '');
+    const firstItemCard = this.page
+      .locator('[data-test-id^="item-card-"]')
+      .first();
+    const itemId = await firstItemCard.getAttribute("data-test-id");
+    return itemId!.replace("item-card-", "");
   }
 }

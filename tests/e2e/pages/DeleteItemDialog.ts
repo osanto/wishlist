@@ -5,7 +5,9 @@ export class DeleteItemDialog {
   private readonly cancelButton: Locator;
 
   constructor(private page: Page) {
-    this.confirmButton = page.locator('[data-test-id="delete-item-confirm-button"]');
+    this.confirmButton = page.locator(
+      '[data-test-id="delete-item-confirm-button"]'
+    );
     this.cancelButton = page.getByRole("button", { name: "Cancel" });
   }
 

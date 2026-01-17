@@ -15,10 +15,18 @@ export abstract class ItemDialogBase {
     protected page: Page,
     testIdPrefix: string
   ) {
-    this.nameInput = page.locator(`[data-test-id="${testIdPrefix}-name-input"]`);
-    this.linkInput = page.locator(`[data-test-id="${testIdPrefix}-link-input"]`);
-    this.notesInput = page.locator(`[data-test-id="${testIdPrefix}-notes-input"]`);
-    this.submitButton = page.locator(`[data-test-id="${testIdPrefix}-submit-button"]`);
+    this.nameInput = page.locator(
+      `[data-test-id="${testIdPrefix}-name-input"]`
+    );
+    this.linkInput = page.locator(
+      `[data-test-id="${testIdPrefix}-link-input"]`
+    );
+    this.notesInput = page.locator(
+      `[data-test-id="${testIdPrefix}-notes-input"]`
+    );
+    this.submitButton = page.locator(
+      `[data-test-id="${testIdPrefix}-submit-button"]`
+    );
     this.cancelButton = page.getByRole("button", { name: "Cancel" });
   }
 

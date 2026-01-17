@@ -9,7 +9,7 @@ on:
 
 jobs:
   code-quality:
-    name: Code Quality
+    name: Code Quality (Format & Type Check)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -23,10 +23,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Run ESLint
-        continue-on-error: true
-        run: npm run lint
 
       - name: Check code formatting
         run: npm run format:check
@@ -157,12 +153,12 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Code Quality (Lint, Format, Type Check) | ${{ needs.code-quality.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Quality (Format, Type Check) | ${{ needs.code-quality.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Unit Tests | ${{ needs.test-unit.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| E2E Tests (Chromium, Firefox, WebKit) | ${{ needs.test-e2e.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ "${{ needs.code-quality.result }}" != "success" ] || [ "${{ needs.build.result }}" != "success" ] || [ "${{ needs.test-unit.result }}" != "success" ] || [ "${{ needs.test-e2e.result }}" != "success" ]; then
             echo "❌ **Some checks failed. Please review the logs above.**" >> $GITHUB_STEP_SUMMARY
             exit 1

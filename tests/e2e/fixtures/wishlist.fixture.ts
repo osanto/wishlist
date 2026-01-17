@@ -31,10 +31,10 @@ export const test = base.extend<WishlistFixtures>({
 
   createdWishlists: async ({}, use) => {
     const adminTokens: string[] = [];
-    
+
     // Provide the array to the test
     await use(adminTokens);
-    
+
     // Cleanup after test
     for (const token of adminTokens) {
       try {

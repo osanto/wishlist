@@ -47,9 +47,7 @@ export async function getWishlistByGuestToken(
  * Fetches all items for a given wishlist.
  * Returns an array of items or empty array if none found.
  */
-export async function getItemsForWishlist(
-  wishlistId: string
-): Promise<Item[]> {
+export async function getItemsForWishlist(wishlistId: string): Promise<Item[]> {
   const { data, error } = await supabase
     .from("items")
     .select("*")
