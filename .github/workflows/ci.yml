@@ -26,6 +26,7 @@ jobs:
 
       - name: Check code formatting
         run: npm run format:check
+
       - name: Run TypeScript type check
         run: npx tsc --noEmit
 
@@ -71,7 +72,7 @@ jobs:
         run: npm ci
 
       - name: Run unit tests
-        run: npm test -- --run
+        run: npm test -- --run --reporter=verbose
 
       - name: Upload test results
         if: always()
@@ -123,23 +124,16 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: npx playwright test --project=${{ matrix.browser }}
+        run: npx playwright test --project=${{ matrix.browser }} --reporter=list
 
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-${{ matrix.browser }}
+          name: playwright-reports
           path: tests/e2e/playwright-report/
           retention-days: 30
-
-      - name: Upload Playwright test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-test-results-${{ matrix.browser }}
-          path: tests/e2e/test-results/
-          retention-days: 7
+          merge-multiple: true
 
   test-summary:
     name: Test Summary
@@ -152,26 +146,30 @@ jobs:
         run: |
           SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-/dev/stdout}"
 
-          {
-            echo "## 🧪 CI Test Results Summary"
-            echo ""
-            echo "| Job | Status |"
-            echo "|-----|--------|"
-            echo "| Code Quality (Format, Type Check) | ${{ needs.code-quality.result }} |"
-            echo "| Build | ${{ needs.build.result }} |"
-            echo "| Unit Tests | ${{ needs.test-unit.result }} |"
-            echo "| E2E Tests (Chromium, Firefox, WebKit) | ${{ needs.test-e2e.result }} |"
-            echo ""
-          } >> "$SUMMARY_FILE"
-
           CODE_QUALITY="${{ needs.code-quality.result }}"
           BUILD="${{ needs.build.result }}"
           UNIT_TESTS="${{ needs.test-unit.result }}"
           E2E_TESTS="${{ needs.test-e2e.result }}"
 
+          {
+            echo "## 🧪 CI Test Results Summary"
+            echo ""
+            echo "| Job | Status |"
+            echo "|-----|--------|"
+            echo "| Code Quality (Format, Type Check) | ${CODE_QUALITY:-unknown} |"
+            echo "| Build | ${BUILD:-unknown} |"
+            echo "| Unit Tests | ${UNIT_TESTS:-unknown} |"
+            echo "| E2E Tests (Chromium, Firefox, WebKit) | ${E2E_TESTS:-unknown} |"
+            echo ""
+
+            if [ "$CODE_QUALITY" != "success" ] || [ "$BUILD" != "success" ] || [ "$UNIT_TESTS" != "success" ] || [ "$E2E_TESTS" != "success" ]; then
+              echo "❌ **Some checks failed. Please review the logs above.**"
+            else
+              echo "✅ **All checks passed!**"
+            fi
+          } >> "$SUMMARY_FILE" 2>&1 || true
+
+          # Exit with code 1 if any job failed, but don't fail the step itself
           if [ "$CODE_QUALITY" != "success" ] || [ "$BUILD" != "success" ] || [ "$UNIT_TESTS" != "success" ] || [ "$E2E_TESTS" != "success" ]; then
-            echo "❌ **Some checks failed. Please review the logs above.**" >> "$SUMMARY_FILE"
             exit 1
-          else
-            echo "✅ **All checks passed!**" >> "$SUMMARY_FILE"
           fi

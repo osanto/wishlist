@@ -1,7 +1,11 @@
 // Load environment variables BEFORE any other imports
 import dotenv from "dotenv";
 import path from "path";
-dotenv.config({ path: path.resolve(__dirname, "../../../.env.local") });
+
+dotenv.config({
+  path: path.resolve(__dirname, "../../../.env.local"),
+  quiet: true,
+});
 
 import { test as base } from "@playwright/test";
 import { HomePage } from "../pages/HomePage";
@@ -29,7 +33,7 @@ export const test = base.extend<WishlistFixtures>({
     await use(new GuestPage(page));
   },
 
-  createdWishlists: async ({}, use) => {
+  createdWishlists: async ({ }, use) => {
     const adminTokens: string[] = [];
 
     // Provide the array to the test

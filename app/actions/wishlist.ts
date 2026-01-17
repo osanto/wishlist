@@ -38,6 +38,10 @@ export async function createWishlistAction() {
     // Redirect to admin page with the admin token
     redirect(`/admin/${adminToken}`);
   } catch (error) {
+    // Don't log redirect errors (Next.js uses errors for redirects)
+    if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+      throw error;
+    }
     console.error("Error in createWishlistAction:", error);
     throw error;
   }
