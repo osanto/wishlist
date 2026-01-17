@@ -148,20 +148,30 @@ jobs:
     if: always()
     steps:
       - name: Test Summary
+        continue-on-error: true
         run: |
-          echo "## 🧪 CI Test Results Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Code Quality (Format, Type Check) | ${{ needs.code-quality.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Unit Tests | ${{ needs.test-unit.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| E2E Tests (Chromium, Firefox, WebKit) | ${{ needs.test-e2e.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          if [ "${{ needs.code-quality.result }}" != "success" ] || [ "${{ needs.build.result }}" != "success" ] || [ "${{ needs.test-unit.result }}" != "success" ] || [ "${{ needs.test-e2e.result }}" != "success" ]; then
-            echo "❌ **Some checks failed. Please review the logs above.**" >> $GITHUB_STEP_SUMMARY
+          SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-/dev/stdout}"
+          
+          {
+            echo "## 🧪 CI Test Results Summary"
+            echo ""
+            echo "| Job | Status |"
+            echo "|-----|--------|"
+            echo "| Code Quality (Format, Type Check) | ${{ needs.code-quality.result }} |"
+            echo "| Build | ${{ needs.build.result }} |"
+            echo "| Unit Tests | ${{ needs.test-unit.result }} |"
+            echo "| E2E Tests (Chromium, Firefox, WebKit) | ${{ needs.test-e2e.result }} |"
+            echo ""
+          } >> "$SUMMARY_FILE"
+          
+          CODE_QUALITY="${{ needs.code-quality.result }}"
+          BUILD="${{ needs.build.result }}"
+          UNIT_TESTS="${{ needs.test-unit.result }}"
+          E2E_TESTS="${{ needs.test-e2e.result }}"
+          
+          if [ "$CODE_QUALITY" != "success" ] || [ "$BUILD" != "success" ] || [ "$UNIT_TESTS" != "success" ] || [ "$E2E_TESTS" != "success" ]; then
+            echo "❌ **Some checks failed. Please review the logs above.**" >> "$SUMMARY_FILE"
             exit 1
           else
-            echo "✅ **All checks passed!**" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **All checks passed!**" >> "$SUMMARY_FILE"
           fi
