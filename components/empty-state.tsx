@@ -15,4 +15,3 @@ export function EmptyState({ title, description, testId }: EmptyStateProps) {
     </div>
   );
 }
-

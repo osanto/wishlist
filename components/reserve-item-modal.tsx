@@ -51,8 +51,8 @@ export function ReserveItemModal({
         </DialogHeader>
         <div className="py-1">
           <p className="text-sm text-muted-foreground">
-            Are you sure you want to reserve &quot;{item?.name}&quot;? This
-            will mark the item as reserved by you.
+            Are you sure you want to reserve &quot;{item?.name}&quot;? This will
+            mark the item as reserved by you.
           </p>
         </div>
         <DialogFooter>
@@ -77,4 +77,3 @@ export function ReserveItemModal({
     </Dialog>
   );
 }
-

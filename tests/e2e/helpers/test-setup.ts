@@ -54,7 +54,11 @@ export async function setupWishlistWithItem(
   itemNotes?: string
 ): Promise<SetupWishlistWithItemResult> {
   // 1. Create wishlist
-  const { adminToken, guestToken } = await setupWishlist(homePage, adminPage, createdWishlists);
+  const { adminToken, guestToken } = await setupWishlist(
+    homePage,
+    adminPage,
+    createdWishlists
+  );
 
   // 2. Add an item
   await adminPage.clickAddItem();

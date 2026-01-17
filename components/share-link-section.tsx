@@ -21,13 +21,9 @@ export function ShareLinkSection({ guestUrl }: ShareLinkSectionProps) {
   };
 
   return (
-    <Button
-      onClick={handleCopy}
-      data-test-id="copy-link-button"
-    >
+    <Button onClick={handleCopy} data-test-id="copy-link-button">
       <Link2Icon />
       Copy Link
     </Button>
   );
 }
-

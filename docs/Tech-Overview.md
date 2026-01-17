@@ -223,12 +223,14 @@ Workflow:
 ## Components
 
 ### Core Components
+
 - `AppHeader` - Header with theme toggle
 - `ThemeToggle` - Dark/light mode switcher
 - `ThemeProvider` - Theme context provider
 - `TokenHandler` - Client component for token persistence
 
 ### Page Components
+
 - `AdminPageClient` - Client wrapper for admin page
 - `AdminPageHeader` - Admin page header with edit/copy functionality
 - `AdminItemsList` - List of items with admin controls
@@ -236,10 +238,12 @@ Workflow:
 - `GuestItemsList` - List of items with reservation controls
 
 ### Item Components
+
 - `ItemCard` - Display item with name, link, notes, and reservation status
 - `EmptyState` - Empty state when no items exist
 
 ### Dialog Components
+
 - `AddItemDialog` - Dialog for adding new items
 - `EditItemDialog` - Dialog for editing items
 - `DeleteItemDialog` - Confirmation dialog for deleting items
@@ -249,6 +253,7 @@ Workflow:
 - `UnreserveItemDialog` - Dialog for unreserving items (admin)
 
 ### Utility Components
+
 - `ShareLinkSection` - Section with guest link and copy button
 
 Everything is reusable for multi-wishlist support later.

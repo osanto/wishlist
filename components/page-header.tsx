@@ -12,9 +12,7 @@ export function PageHeader({ title, description, shareUrl }: PageHeaderProps) {
       <h1 className="text-3xl font-bold" data-test-id="wishlist-title">
         {title}
       </h1>
-      {description && (
-        <p className="text-muted-foreground">{description}</p>
-      )}
+      {description && <p className="text-muted-foreground">{description}</p>}
       {shareUrl && (
         <div className="mt-6 rounded-lg border bg-card p-6 space-y-4">
           <h2 className="text-lg font-semibold">Share with Guests</h2>

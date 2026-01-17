@@ -1,5 +1,7 @@
 # Wishlist App
 
+[![CI Status](https://github.com/osanto/wishlist/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/osanto/wishlist/actions/workflows/ci.yml?query=branch%3Amain)
+
 A simple, anonymous wishlist web application where owners can create wishlists and share them with guests. Guests can reserve items anonymously without creating an account.
 
 ## Screenshots

@@ -212,7 +212,9 @@ test.describe("Create Wishlist Flow", () => {
       .single();
 
     expect(updatedWishlist?.title).toBe("Birthday Wishlist 2026");
-    expect(updatedWishlist?.description).toBe("Things I'd love for my birthday!");
+    expect(updatedWishlist?.description).toBe(
+      "Things I'd love for my birthday!"
+    );
 
     // 9. Verify updated title also appears in guest view
     const guestPageContext = await context.newPage();

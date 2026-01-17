@@ -7,8 +7,12 @@ export class UnreserveItemDialog {
 
   constructor(private page: Page) {
     this.dialog = page.locator('[data-test-id="unreserve-item-dialog"]');
-    this.confirmButton = page.locator('[data-test-id="confirm-unreserve-button"]');
-    this.cancelButton = page.locator('[data-test-id="cancel-unreserve-button"]');
+    this.confirmButton = page.locator(
+      '[data-test-id="confirm-unreserve-button"]'
+    );
+    this.cancelButton = page.locator(
+      '[data-test-id="cancel-unreserve-button"]'
+    );
   }
 
   async confirmAndWaitForClose() {

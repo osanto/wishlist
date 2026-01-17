@@ -78,7 +78,10 @@ test.describe("Wishlist Management", () => {
 });
 
 test.describe("404 Error Handling", () => {
-  test("admin page shows 404 for invalid token", async ({ page, adminPage }) => {
+  test("admin page shows 404 for invalid token", async ({
+    page,
+    adminPage,
+  }) => {
     // Test data
     const invalidToken = "invalid-token-that-does-not-exist";
 
@@ -93,7 +96,10 @@ test.describe("404 Error Handling", () => {
     await adminPage.expectWishlistTitleNotVisible();
   });
 
-  test("guest page shows 404 for invalid token", async ({ page, guestPage }) => {
+  test("guest page shows 404 for invalid token", async ({
+    page,
+    guestPage,
+  }) => {
     // Test data
     const invalidToken = "invalid-token-that-does-not-exist";
 

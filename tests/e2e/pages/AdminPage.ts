@@ -24,7 +24,9 @@ export class AdminPage {
   constructor(public page: Page) {
     this.addItemButton = page.locator('[data-test-id="add-item-button"]');
     this.wishlistTitle = page.locator('[data-test-id="wishlist-title"]');
-    this.editWishlistButton = page.locator('[data-test-id="edit-wishlist-button"]');
+    this.editWishlistButton = page.locator(
+      '[data-test-id="edit-wishlist-button"]'
+    );
     this.copyLinkButton = page.locator('[data-test-id="copy-link-button"]');
     this.emptyState = page.locator('[data-test-id="empty-state"]');
 
@@ -34,7 +36,7 @@ export class AdminPage {
     this.deleteItemDialog = new DeleteItemDialog(page);
     this.editWishlistDialog = new EditWishlistDialog(page);
     this.unreserveItemDialog = new UnreserveItemDialog(page);
-    
+
     // Initialize assertions helper
     this.assertions = new ItemAssertions(page);
   }
@@ -78,14 +80,18 @@ export class AdminPage {
 
   async clickEditItemButton() {
     // Click the first edit button (using partial match for dynamic ID)
-    const editButton = this.page.locator('[data-test-id^="edit-item-"]').first();
+    const editButton = this.page
+      .locator('[data-test-id^="edit-item-"]')
+      .first();
     await editButton.waitFor({ state: "visible" });
     await editButton.click({ force: true });
   }
 
   async clickDeleteItemButton() {
     // Click the first delete button (using partial match for dynamic ID)
-    const deleteButton = this.page.locator('[data-test-id^="delete-item-"]').first();
+    const deleteButton = this.page
+      .locator('[data-test-id^="delete-item-"]')
+      .first();
     await deleteButton.waitFor({ state: "visible" });
     await deleteButton.click({ force: true });
   }
@@ -121,14 +127,16 @@ export class AdminPage {
   async getGuestUrl(): Promise<string> {
     // Grant clipboard permissions (only works in Chromium)
     try {
-      await this.page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+      await this.page
+        .context()
+        .grantPermissions(["clipboard-read", "clipboard-write"]);
     } catch (e) {
       // Firefox/WebKit don't support clipboard-read permission, but clipboard API still works
     }
-    
+
     // Click the copy button to copy the guest URL to clipboard
     await this.copyLinkButton.click();
-    
+
     // Read from clipboard using Playwright's evaluate
     const guestUrl = await this.page.evaluate(async () => {
       return await navigator.clipboard.readText();
@@ -138,9 +146,11 @@ export class AdminPage {
 
   async getFirstItemId(): Promise<string> {
     // Get the first item's ID from the reserve button data-test-id
-    const firstItemCard = this.page.locator('[data-test-id^="item-card-"]').first();
-    const itemId = await firstItemCard.getAttribute('data-test-id');
-    return itemId!.replace('item-card-', '');
+    const firstItemCard = this.page
+      .locator('[data-test-id^="item-card-"]')
+      .first();
+    const itemId = await firstItemCard.getAttribute("data-test-id");
+    return itemId!.replace("item-card-", "");
   }
 
   async clickUnreserveItem(itemId: string) {

@@ -49,10 +49,10 @@ export default async function GuestPage({ params }: GuestPageProps) {
       <AppHeader />
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-4xl p-6 space-y-8">
-        <PageHeader
-          title={wishlist.title}
-          description={wishlist.description || undefined}
-        />
+          <PageHeader
+            title={wishlist.title}
+            description={wishlist.description || undefined}
+          />
 
           {/* Items Section - now using real data from database */}
           <div className="space-y-4">

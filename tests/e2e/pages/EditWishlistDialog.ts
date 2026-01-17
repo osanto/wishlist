@@ -8,9 +8,15 @@ export class EditWishlistDialog {
   private readonly dialog: Locator;
 
   constructor(private page: Page) {
-    this.titleInput = page.locator('[data-test-id="edit-wishlist-title-input"]');
-    this.descriptionInput = page.locator('[data-test-id="edit-wishlist-description-input"]');
-    this.submitButton = page.locator('[data-test-id="edit-wishlist-submit-button"]');
+    this.titleInput = page.locator(
+      '[data-test-id="edit-wishlist-title-input"]'
+    );
+    this.descriptionInput = page.locator(
+      '[data-test-id="edit-wishlist-description-input"]'
+    );
+    this.submitButton = page.locator(
+      '[data-test-id="edit-wishlist-submit-button"]'
+    );
     this.cancelButton = page.getByRole("button", { name: "Cancel" });
     this.dialog = page.getByRole("dialog");
   }

@@ -20,12 +20,12 @@ export function getOrCreateReservationToken(): string {
   }
 
   let token = localStorage.getItem(RESERVATION_TOKEN_KEY);
-  
+
   if (!token) {
     token = uuidv4();
     localStorage.setItem(RESERVATION_TOKEN_KEY, token);
   }
-  
+
   return token;
 }
 
