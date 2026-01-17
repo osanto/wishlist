@@ -151,7 +151,7 @@ jobs:
         continue-on-error: true
         run: |
           SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-/dev/stdout}"
-          
+
           {
             echo "## 🧪 CI Test Results Summary"
             echo ""
@@ -163,12 +163,12 @@ jobs:
             echo "| E2E Tests (Chromium, Firefox, WebKit) | ${{ needs.test-e2e.result }} |"
             echo ""
           } >> "$SUMMARY_FILE"
-          
+
           CODE_QUALITY="${{ needs.code-quality.result }}"
           BUILD="${{ needs.build.result }}"
           UNIT_TESTS="${{ needs.test-unit.result }}"
           E2E_TESTS="${{ needs.test-e2e.result }}"
-          
+
           if [ "$CODE_QUALITY" != "success" ] || [ "$BUILD" != "success" ] || [ "$UNIT_TESTS" != "success" ] || [ "$E2E_TESTS" != "success" ]; then
             echo "❌ **Some checks failed. Please review the logs above.**" >> "$SUMMARY_FILE"
             exit 1
