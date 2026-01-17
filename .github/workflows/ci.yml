@@ -117,23 +117,22 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run E2E tests
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: npx playwright test --project=${{ matrix.browser }} --reporter=list
+        run: npx playwright test --project=${{ matrix.browser }} --reporter=list,html
 
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-reports
+          name: playwright-report-${{ matrix.browser }}
           path: tests/e2e/playwright-report/
+          if-no-files-found: ignore
           retention-days: 30
-          merge-multiple: true
 
   test-summary:
     name: Test Summary
