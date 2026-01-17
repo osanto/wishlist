@@ -88,12 +88,10 @@ describe("editWishlistAction", () => {
     mockFrom.mockReturnValueOnce({
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      single: vi
-        .fn()
-        .mockResolvedValue({
-          data: null,
-          error: { message: "Not found", code: "404" },
-        }),
+      single: vi.fn().mockResolvedValue({
+        data: null,
+        error: { message: "Not found", code: "404" },
+      }),
     });
 
     const result = await editWishlistAction("invalid-token", mockEditData);
@@ -137,11 +135,9 @@ describe("editWishlistAction", () => {
     // Mock wishlist update failure
     mockFrom.mockReturnValueOnce({
       update: vi.fn().mockReturnThis(),
-      eq: vi
-        .fn()
-        .mockResolvedValue({
-          error: { message: "DB update failed", code: "DB_ERROR" },
-        }),
+      eq: vi.fn().mockResolvedValue({
+        error: { message: "DB update failed", code: "DB_ERROR" },
+      }),
     });
 
     const result = await editWishlistAction(mockAdminToken, mockEditData);

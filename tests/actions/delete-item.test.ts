@@ -92,12 +92,10 @@ describe("deleteItemAction", () => {
     mockFrom.mockReturnValueOnce({
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      single: vi
-        .fn()
-        .mockResolvedValue({
-          data: null,
-          error: { message: "Not found", code: "404" },
-        }),
+      single: vi.fn().mockResolvedValue({
+        data: null,
+        error: { message: "Not found", code: "404" },
+      }),
     });
 
     const result = await deleteItemAction("invalid-token", mockItemId);
@@ -124,12 +122,10 @@ describe("deleteItemAction", () => {
     mockFrom.mockReturnValueOnce({
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      single: vi
-        .fn()
-        .mockResolvedValue({
-          data: null,
-          error: { message: "No rows found", code: "PGRST116" },
-        }),
+      single: vi.fn().mockResolvedValue({
+        data: null,
+        error: { message: "No rows found", code: "PGRST116" },
+      }),
     });
 
     const result = await deleteItemAction(mockAdminToken, mockItemId);
@@ -166,11 +162,9 @@ describe("deleteItemAction", () => {
     // Mock item deletion failure
     mockFrom.mockReturnValueOnce({
       delete: vi.fn().mockReturnThis(),
-      eq: vi
-        .fn()
-        .mockResolvedValue({
-          error: { message: "DB delete failed", code: "DB_ERROR" },
-        }),
+      eq: vi.fn().mockResolvedValue({
+        error: { message: "DB delete failed", code: "DB_ERROR" },
+      }),
     });
 
     const result = await deleteItemAction(mockAdminToken, mockItemId);
