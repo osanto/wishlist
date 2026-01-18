@@ -81,6 +81,23 @@ A simple, anonymous wishlist web application where owners can create wishlists a
 - npm or yarn
 - Supabase account (free tier works)
 
+## Testing Strategy
+
+This project includes:
+
+- Unit tests for business logic (Server Actions)
+- Playwright E2E tests for critical user flows:
+  - Admin creates a wishlist
+  - Guest reserves an item
+  - Guest cancels their own reservation
+- Testing prioritizes access control boundaries between admin and guest
+  actions and correctness of reservation logic
+
+Out of scope:
+
+- Visual regression tests
+- Load testing (MVP scale)
+
 ## Getting Started
 
 ### 1. Clone the Repository
